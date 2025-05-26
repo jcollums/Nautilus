@@ -85,6 +85,7 @@
             this.btnRB2 = new System.Windows.Forms.Button();
             this.btnRB3 = new System.Windows.Forms.Button();
             this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.permanentlyDeleteTempFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumb10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumb9)).BeginInit();
@@ -525,6 +526,7 @@
             this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.useExistingFolderStructureToolStripMenuItem,
             this.useRecursiveSearching,
+            this.permanentlyDeleteTempFiles,
             this.toolStripMenuItem1,
             this.setGameIDToolStripMenuItem,
             this.setDTAEncodingToolStripMenuItem,
@@ -822,6 +824,14 @@
             this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
             this.hidePackFromRB3.Text = "Hide pack from RB3";
             // 
+            // permanentlyDeleteTempFiles
+            // 
+            this.permanentlyDeleteTempFiles.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.permanentlyDeleteTempFiles.CheckOnClick = true;
+            this.permanentlyDeleteTempFiles.Name = "permanentlyDeleteTempFiles";
+            this.permanentlyDeleteTempFiles.Size = new System.Drawing.Size(231, 22);
+            this.permanentlyDeleteTempFiles.Text = "Permanently delete temp files";
+            // 
             // PackCreator
             // 
             this.AllowDrop = true;
@@ -945,5 +955,6 @@
         private System.Windows.Forms.Button btnRB2;
         private System.Windows.Forms.Button btnRB3;
         private System.Windows.Forms.ToolStripMenuItem hidePackFromRB3;
+        private System.Windows.Forms.ToolStripMenuItem permanentlyDeleteTempFiles;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -19,13 +19,22 @@ namespace Nautilus
     {
         private static string inputDir;
         private static List<string> inputFiles;
+        private static List<List<string>> fileBatches;
+        private static int currentBatchIndex;
+        private const string BatchNumberPlaceholder = "{Batch#}";
+        private const long GB = 1_073_741_824;
+        private const long MAX_BATCH_SIZE = GB * 4;
+        /// <summary>
+        /// A string template for the output file name, containing <c>BatchNumberPlaceholder</c>
+        /// </summary>
+        private static string xOutBatchTemplate;
         private static int intFiles;
         private static string tempFolder;
         private static string tempThumbs;
         private static string sOpenPackage;
         private static string xOut;
         private Boolean continueSession;
-        private readonly CreateSTFS packfiles = new CreateSTFS();
+        private CreateSTFS packfiles = new CreateSTFS();
         private DateTime startTime;
         private DateTime endTime;
         private string contentImage;
@@ -66,6 +75,7 @@ namespace Nautilus
             thumb10.AllowDrop = true;
 
             inputFiles = new List<string>();
+            fileBatches = new List<List<string>>();
             tempFolder = Application.StartupPath + "\\extracted\\";
             tempThumbs = tempFolder + "thumbs\\";
             Tools = new NemoTools();
@@ -234,8 +244,8 @@ namespace Nautilus
                             }
                         }
                     }
-                    //load files in directory
-                    var inFiles = Directory.GetFiles(txtFolder.Text, ".", doRecursiveSearching ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
+                    // load files in directory, sorted alphabetically
+                    var inFiles = Directory.GetFiles(txtFolder.Text, ".", doRecursiveSearching ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).OrderBy(f => Path.GetFileName(f)).ToList();
                     foreach (var file in inFiles)
                     {
                         try
@@ -299,16 +309,28 @@ namespace Nautilus
                             }
                         }
 
-                        if (byteCount > 4294967296) //greater than 4.00GB
+                        populateFileBatches(out var skippedFileResult);
+                        
+                        if (skippedFileResult.Any())
                         {
-                            var sizeInGB = (Decimal) byteCount/1073741824;
-
-                            MessageBox.Show("There is a 4.00GB combined input file size limit\nYour files add up to " +
-                                sizeInGB + "GB!\nTry deleting some files from the input folder first",
-                                Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            Log("Combined input file size is over 4GB limit ... delete some files and try again");
-                            return;
+                            Log("The following files were skipped as they exceed the maximum pack size of 4GB:");
+                            foreach (var file in skippedFileResult)
+                            {
+                                Log(Path.GetFileName(file));
+                            }
                         }
+
+                        if (byteCount > MAX_BATCH_SIZE)
+                        {
+                            var sizeInGB = (decimal)byteCount / GB;
+                            MessageBox.Show("The combined input file size is over 4GB, which is the maximum size for a single pack.\n" +
+                                fileBatches.Count + " numbered packs will be created when you begin the process.",
+                                Text + " - Pack Batches", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            Log("Combined input file size is over 4GB limit");
+                            Log($"Total files size is {sizeInGB:F2}GB");
+                            Log($"I will create {fileBatches.Count} numbered packs");
+                        }
+
                         Log("Ready to begin");
                         btnBegin.Visible = true;
                         btnRefresh.Visible = true;
@@ -327,11 +349,53 @@ namespace Nautilus
             }
         }
 
+        private void populateFileBatches(out List<string> skippedFileResult)
+        {
+            // Create batches of files that don't exceed 4GB
+            List<string> currentBatch = new List<string>();
+            skippedFileResult = new List<string>();
+            long currentBatchSize = 0;
+            fileBatches.Clear();
+
+            foreach (var file in inputFiles)
+            {
+                var fileSize = new FileInfo(file).Length;
+                // Adding the next file will put it over the pack size limit
+                if (currentBatchSize + fileSize > MAX_BATCH_SIZE)
+                {
+                    if (currentBatch.Count > 0)
+                    {
+                        fileBatches.Add(new List<string>(currentBatch));
+                        currentBatch.Clear();
+                        currentBatchSize = 0;
+                    }
+                    else
+                    {
+                        skippedFileResult.Add(file);
+                        continue;
+                    }
+                }
+                currentBatch.Add(file);
+                currentBatchSize += fileSize;
+            }
+
+            // Add any remainder files
+            if (currentBatch.Count > 0)
+            {
+                fileBatches.Add(currentBatch);
+            }
+        }
+
         private bool extractRBFiles()
         {
-            var counter = 0;
+            var currentBatch = fileBatches[currentBatchIndex];
+            if (fileBatches.Count > 1)
+            {
+                Log($"Processing batch {currentBatchIndex + 1} of {fileBatches.Count}");
+            }
+            var counter = currentBatchIndex > 0 ? fileBatches.Take(currentBatchIndex).Sum(batch => batch.Count) : 0;
             var success = 0;
-            foreach (var file in inputFiles.Where(File.Exists))
+            foreach (var file in currentBatch.Where(File.Exists))
             {
                 if (backgroundWorker1.CancellationPending) return false;
                 try
@@ -496,7 +560,7 @@ namespace Nautilus
             if (counter > 0)
             {
                 Log("Successfully extracted " + success + " of " + counter + (counter == 1 ? " file" : " files"));
-                
+
                 var extracted = Directory.GetDirectories(tempFolder + "songs\\").Count();
                 if (extracted > counter)
                 {
@@ -873,12 +937,22 @@ namespace Nautilus
                 else
                 {
                     fileOutput.FileName = "CustomPack_";
+                    txtTitle.Text = "Custom Pack";
                 }
-                
+
+                if (fileBatches.Count > 1)
+                {
+                    fileOutput.FileName += BatchNumberPlaceholder;
+                    txtTitle.Text += " " + BatchNumberPlaceholder;
+                }
+
                 fileOutput.InitialDirectory = txtFolder.Text;
                 if (fileOutput.ShowDialog() == DialogResult.OK)
                 {
                     xOut = fileOutput.FileName;
+                    xOutBatchTemplate = xOut;
+                    currentBatchIndex = 0;
+
                     Tools.CurrentFolder = Path.GetDirectoryName(xOut);
                     //start animation and send to background worker
                     picWorking.Visible = true;
@@ -1009,6 +1083,13 @@ namespace Nautilus
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             sOpenPackage = "";
+            if (fileBatches.Count > 1)
+            {
+                xOut = xOutBatchTemplate.Replace(BatchNumberPlaceholder, $"{currentBatchIndex + 1}");
+                Log($"I am writing the next batch pack to:");
+                Log(xOut);
+            }
+
             try
             {
                 var files = Directory.GetFiles(txtFolder.Text, ".", doRecursiveSearching ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -1067,7 +1148,13 @@ namespace Nautilus
             }
 
             Log("Beginning to add files to the pack");
-            
+
+            if (fileBatches.Count > 1)
+            {
+                // Re-initialize the packfiles so that they don't get included in the next batch
+                packfiles = new CreateSTFS();
+            }
+
             if (rockBandToolStripMenuItem.Checked)
             {
                 packfiles.HeaderData.TitleID = 0x45410829;
@@ -1095,8 +1182,14 @@ namespace Nautilus
             {
                 packfiles.HeaderData.ThisType = PackageType.MarketPlace;
             }
-            packfiles.HeaderData.Title_Display = txtTitle.Text;
-            packfiles.HeaderData.Description = txtDesc.Text;
+
+            if (fileBatches.Count > 1) {
+                packfiles.HeaderData.Title_Display = txtTitle.Text.Replace(BatchNumberPlaceholder, $"{currentBatchIndex + 1}");
+                packfiles.HeaderData.Description = txtDesc.Text.Replace(BatchNumberPlaceholder, $"{currentBatchIndex + 1}");
+            } else {
+                packfiles.HeaderData.Title_Display = txtTitle.Text;
+                packfiles.HeaderData.Description = txtDesc.Text;
+            }
             packfiles.HeaderData.ContentImageBinary = picContent.Image.ImageToBytes(ImageFormat.Png);
             packfiles.HeaderData.PackageImageBinary = picPackage.Image.ImageToBytes(ImageFormat.Png);
 
@@ -1110,7 +1203,7 @@ namespace Nautilus
                 Invoke(new MethodInvoker(() => Width = minWidth));
                 success = buildPackage();
             }
-            
+
             if (success)
             {
                 Log("Trying to unlock CON file");
@@ -1155,7 +1248,12 @@ namespace Nautilus
                 {
                     try
                     {
-                        Tools.SendtoTrash(tempFolder,true); //send files to recycle bin
+
+                        if (permanentlyDeleteTempFiles.Checked) {
+                            Tools.DeleteFolder(tempFolder, true); //delete files permanently
+                        } else {
+                            Tools.SendtoTrash(tempFolder, true); //send files to recycle bin
+                        }
                         Directory.CreateDirectory(tempFolder); //restore empty extracted folder (requested by C16)
                     }
                     catch
@@ -1167,16 +1265,18 @@ namespace Nautilus
             
             if (success)
             {
-                Log("Done!");
-                endTime = DateTime.Now;
-                var timeDiff = endTime - startTime;
-                Log("Process took " + timeDiff.Minutes + (timeDiff.Minutes == 1 ? " minute" : " minutes") + " and " + (timeDiff.Minutes == 0 && timeDiff.Seconds == 0 ? "1 second" : timeDiff.Seconds + " seconds"));
-                Log("You can click View Package to close this form");
-                Log("and open the new pack in CON Explorer");
-                Log("Click reset to start again and create a new pack,");
-                Log("or just close me down and enjoy your new pack!");
-                
-                sOpenPackage = xOut;
+                if (currentBatchIndex == fileBatches.Count - 1)
+                {
+                    Log("Done!");
+                    endTime = DateTime.Now;
+                    var timeDiff = endTime - startTime;
+                    Log("Process took " + timeDiff.Minutes + (timeDiff.Minutes == 1 ? " minute" : " minutes") + " and " + (timeDiff.Minutes == 0 && timeDiff.Seconds == 0 ? "1 second" : timeDiff.Seconds + " seconds"));
+                    Log("You can click View Package to close this form");
+                    Log("and open the new pack in CON Explorer");
+                    Log("Click reset to start again and create a new pack,");
+                    Log("or just close me down and enjoy your new pack!");
+                    sOpenPackage = xOut;
+                }
             }
             else
             {
@@ -1186,16 +1286,47 @@ namespace Nautilus
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(sOpenPackage))
+            {
+                // User must have cancelled the operation
+                onWorkerFinished();
+                return;
+            }
+
+            // Are we done with the last batch?
+            if (currentBatchIndex == fileBatches.Count - 1)
+            {
+                onWorkerFinished();
+
+                if (fileBatches.Count > 1)
+                {
+                    Log("All pack batches finished processing");
+
+                }
+            }
+            else
+            {
+                // Run next batch
+                currentBatchIndex++;
+                backgroundWorker1.RunWorkerAsync();
+            }
+        }
+        
+        private void onWorkerFinished()
+        {
             picWorking.Visible = false;
             btnReset.Visible = true;
+            btnBegin.Visible = false;
             btnBegin.Enabled = true;
             toolTip1.SetToolTip(btnBegin, "Click to create pack");
             btnBegin.Text = "&Begin";
 
-            if (string.IsNullOrWhiteSpace(sOpenPackage)) return;
-            btnBegin.Visible = false;
-            btnViewPackage.Visible = true;
-        }              
+            // The View Package button only makes sense if there's one package generated
+            if (fileBatches.Count == 1)
+            {
+                btnViewPackage.Visible = true;
+            }
+        }
 
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
         {
