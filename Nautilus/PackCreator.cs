@@ -311,19 +311,21 @@ namespace Nautilus
 
                         populateFileBatches(out var skippedFileResult);
                         
+                        // Very unlikely to happen, but just in case
                         if (skippedFileResult.Any())
                         {
-                            Log("The following files were skipped as they exceed the maximum pack size of 4GB:");
+                            MessageBox.Show("Some files were skipped for being too big, check the log for details.", Text + " - Skipped Files", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            Log("The following files were skipped because they exceed the maximum pack size of 4GB:");
                             foreach (var file in skippedFileResult)
                             {
-                                Log(Path.GetFileName(file));
+                                Log(file);
                             }
                         }
 
                         if (byteCount > MAX_BATCH_SIZE)
                         {
                             var sizeInGB = (decimal)byteCount / GB;
-                            MessageBox.Show("The combined input file size is over 4GB, which is the maximum size for a single pack.\n" +
+                            MessageBox.Show("The combined input file size is over 4GB, which is the maximum size for a single pack.\n\n" +
                                 fileBatches.Count + " numbered packs will be created when you begin the process.",
                                 Text + " - Pack Batches", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             Log("Combined input file size is over 4GB limit");
