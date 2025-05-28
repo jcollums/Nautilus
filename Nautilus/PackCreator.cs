@@ -7,11 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
 using Nautilus.Properties;
 using Nautilus.x360;
-using Microsoft.VisualBasic.FileIO;
-using SearchOption = System.IO.SearchOption;
 using NautilusFREE;
+using SearchOption = System.IO.SearchOption;
 
 namespace Nautilus
 {
@@ -19,14 +19,14 @@ namespace Nautilus
     {
         private static string inputDir;
         private static List<string> inputFiles;
-        private static List<List<string>> fileBatches;
-        private static List<string> fileBatchNames;
-        private static int currentBatchIndex;
-        private const string BatchNumberPlaceholder = "{Pack#}";
-        private const string BatchFolderPlaceholder = "{Folder}";
+        private static List<List<string>> inputFilePacks;
+        private static List<string> inputFilePackPaths;
+        private static int currentPackIndex;
+        private const string PackNumberPlaceholder = "{Pack#}";
+        private const string PackFolderPlaceholder = "{Folder}";
         private const long GB = 1_073_741_824;
-        private const long MAX_BATCH_SIZE = GB * 4;
-        private static string xOutBatchTemplate;
+        private const long MAX_PACK_SIZE = GB * 4;
+        private static string xOutPackPathTemplate;
         private static int intFiles;
         private static string tempFolder;
         private static string tempThumbs;
@@ -74,8 +74,8 @@ namespace Nautilus
             thumb10.AllowDrop = true;
 
             inputFiles = new List<string>();
-            fileBatches = new List<List<string>>();
-            fileBatchNames = new List<string>();
+            inputFilePacks = new List<List<string>>();
+            inputFilePackPaths = new List<string>();
             tempFolder = Application.StartupPath + "\\extracted\\";
             tempThumbs = tempFolder + "thumbs\\";
             Tools = new NemoTools();
@@ -242,7 +242,7 @@ namespace Nautilus
                             }
                         }
                     }
-                    // load files in directory, sorted alphabetically
+                    // load files in directory, sorted alphabetically so that they might be split predictably when necessary
                     var inFiles = Directory.GetFiles(txtFolder.Text, ".", doRecursiveSearching ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).OrderBy(f => f).ToList();
                     foreach (var file in inFiles)
                     {
@@ -306,7 +306,7 @@ namespace Nautilus
                             }
                         }
 
-                        populateFileBatches();
+                        populatePacks();
 
                         Log("Ready to begin");
                         btnBegin.Visible = true;
@@ -326,7 +326,7 @@ namespace Nautilus
             }
         }
 
-        private string getFolderBatchName(string filePath)
+        private string getPackNameByFolder(string filePath)
         {
             string relativePath = filePath.Replace(txtFolder.Text + "\\", "").Replace(Path.GetFileName(filePath), "").Replace("\\\\", "");
             if (relativePath == "")
@@ -349,52 +349,51 @@ namespace Nautilus
             return null;
         }
 
-        private string formatBatchIndex(int batchIndex) 
+        private string formatPackIndex(int packIndex) 
         {
             // 01, 02, 03, etc.
-            return (batchIndex + 1).ToString().PadLeft(2, '0');
+            return (packIndex + 1).ToString().PadLeft(2, '0');
         }
 
-        private string formatBatchTemplateName(string template, int batchIndex, string folder)
+        private string formatPackPathTemplate(string template, int packIndex, string folder)
         {
             string result = template;
 
-            result = result.Replace(BatchNumberPlaceholder, formatBatchIndex(batchIndex));
+            result = result.Replace(PackNumberPlaceholder, formatPackIndex(packIndex));
             if (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked)
             {
-                result = result.Replace(BatchFolderPlaceholder, folder);
+                result = result.Replace(PackFolderPlaceholder, folder);
             }
             return result;
         }
 
-        private void populateFileBatches()
+        private void populatePacks()
         {
-            // Create batches of files that don't exceed 4GB
-            List<string> currentBatch = new List<string>();
+            List<string> currentPack = new List<string>();
             List<string> skippedFileResult = new List<string>();
-            string prevFolder = getFolderBatchName(inputFiles[0]);
-            long currentBatchSize = 0;
+            string prevFolder = getPackNameByFolder(inputFiles[0]);
+            long currentPackSize = 0;
             long totalSize = 0;
-            fileBatches.Clear();
+            inputFilePacks.Clear();
 
-            Log("Calculating file batches...");
+            Log("Assigning files to packs...");
             EnableDisable(false);
 
             foreach (var file in inputFiles)
             {
                 var fileSize = new FileInfo(file).Length;
-                bool wouldExceedSizeLimit = currentBatchSize + fileSize > MAX_BATCH_SIZE;
+                bool wouldExceedSizeLimit = currentPackSize + fileSize > MAX_PACK_SIZE;
 
-                string currentFolder = getFolderBatchName(file);
+                string currentFolder = getPackNameByFolder(file);
                 bool shouldSplitOnNewFolder = (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked) && (prevFolder != currentFolder);
 
                 if (shouldSplitOnNewFolder || wouldExceedSizeLimit)
                 {
-                    if (currentBatch.Count > 0)
+                    if (currentPack.Count > 0)
                     {
-                        fileBatches.Add(new List<string>(currentBatch));
-                        currentBatch.Clear();
-                        currentBatchSize = 0;
+                        inputFilePacks.Add(new List<string>(currentPack));
+                        currentPack.Clear();
+                        currentPackSize = 0;
                     }
                     else
                     {
@@ -402,17 +401,17 @@ namespace Nautilus
                         continue;
                     }
                 }
-                currentBatch.Add(file);
-                currentBatchSize += fileSize;
+                currentPack.Add(file);
+                currentPackSize += fileSize;
                 totalSize += fileSize;
 
                 prevFolder = currentFolder;
             }
 
             // Add any remainder files
-            if (currentBatch.Count > 0)
+            if (currentPack.Count > 0)
             {
-                fileBatches.Add(currentBatch);
+                inputFilePacks.Add(currentPack);
             }
 
             // This is insanely unlikely to happen but who knows
@@ -425,56 +424,56 @@ namespace Nautilus
             if (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked)
             {
                 string folder = splitByFolderToolStripMenuItem.Checked ? "folder" : "subfolder";
-                Log($"Split by {folder} batch processing option selected");
-                Log($"I will create {fileBatches.Count} numbered packs split by {folder},");
+                Log($"Split pack by {folder} option selected");
+                Log($"I will create {inputFilePacks.Count} numbered packs split by {folder},");
                 Log($"or split when {folder} is greater than 4GB.");
             }
-            else if (totalSize > MAX_BATCH_SIZE)
+            else if (totalSize > MAX_PACK_SIZE)
             {
                 var sizeInGB = (decimal)totalSize / GB;
                 Log("Combined input file size is over 4GB limit");
                 Log($"Total files size is {sizeInGB:F2}GB");
-                Log($"I will create {fileBatches.Count} numbered packs");
+                Log($"I will create {inputFilePacks.Count} numbered packs");
                 MessageBox.Show("The combined input file size is over 4GB, which is the maximum size for a single pack.\n\n" +
-                                fileBatches.Count + " numbered packs will be created when you begin the process.",
+                                inputFilePacks.Count + " numbered packs will be created when you begin the process.",
                                 Text + " - Packs", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             EnableDisable(true);
         }
 
-        private void populateFileBatchNames()
+        private void populatePackPaths()
         {
-            string prevFolder = getFolderBatchName(inputFiles[0]);
-            int batchIndex = 0;
-            fileBatchNames.Clear();
+            string prevFolder = getPackNameByFolder(inputFiles[0]);
+            int packIndex = 0;
+            inputFilePackPaths.Clear();
 
-            foreach (var batch in fileBatches)
+            foreach (var pack in inputFilePacks)
             {
-                string currentFolder = getFolderBatchName(batch[0]);
+                string currentFolder = getPackNameByFolder(pack[0]);
                 bool isNewFolder = (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked) && (prevFolder != currentFolder);
 
                 if (isNewFolder)
                 {
-                    batchIndex = 0;
+                    packIndex = 0;
                 }
-                fileBatchNames.Add(formatBatchTemplateName(xOutBatchTemplate, batchIndex, currentFolder));
+                inputFilePackPaths.Add(formatPackPathTemplate(xOutPackPathTemplate, packIndex, currentFolder));
 
-                batchIndex++;
+                packIndex++;
                 prevFolder = currentFolder;
             }
         }
 
         private bool extractRBFiles()
         {
-            var currentBatch = fileBatches[currentBatchIndex];
-            if (fileBatches.Count > 1)
+            var currentPack = inputFilePacks[currentPackIndex];
+            if (inputFilePacks.Count > 1)
             {
-                Log($"Processing batch {currentBatchIndex + 1} of {fileBatches.Count}");
+                Log($"Processing split pack {currentPackIndex + 1} of {inputFilePacks.Count}");
             }
-            var counter = currentBatchIndex > 0 ? fileBatches.Take(currentBatchIndex).Sum(batch => batch.Count) : 0;
-            var batchCounter = 0;
+            var counter = currentPackIndex > 0 ? inputFilePacks.Take(currentPackIndex).Sum(pack => pack.Count) : 0;
+            var packCounter = 0;
             var success = 0;
-            foreach (var file in currentBatch.Where(File.Exists))
+            foreach (var file in currentPack.Where(File.Exists))
             {
                 if (backgroundWorker1.CancellationPending) return false;
                 try
@@ -483,7 +482,7 @@ namespace Nautilus
                     try
                     {
                         counter++;
-                        batchCounter++;
+                        packCounter++;
                         var xPackage = new STFSPackage(file);
                         if (!xPackage.ParseSuccess)
                         {
@@ -637,14 +636,14 @@ namespace Nautilus
                     Log("The error says: " + ex.Message);
                 }
             }
-            if (batchCounter > 0)
+            if (packCounter > 0)
             {
-                Log("Successfully extracted " + success + " of " + batchCounter + (batchCounter == 1 ? " file" : " files"));
+                Log("Successfully extracted " + success + " of " + packCounter + (packCounter == 1 ? " file" : " files"));
 
                 var extracted = Directory.GetDirectories(tempFolder + "songs\\").Count();
-                if (extracted > batchCounter)
+                if (extracted > packCounter)
                 {
-                    Log("The " + counter + " input CON " + (batchCounter == 1 ? "file" : "files") + " contained a total of " + batchCounter + " songs inside");
+                    Log("The " + counter + " input CON " + (packCounter == 1 ? "file" : "files") + " contained a total of " + packCounter + " songs inside");
                 }
             }
             else
@@ -1077,20 +1076,20 @@ namespace Nautilus
                     txtTitle.Text = "Custom Pack";
                 }
 
-                if (fileBatches.Count > 1)
+                if (inputFilePacks.Count > 1)
                 {
-                    fileOutput.FileName += "_" + BatchNumberPlaceholder;
+                    fileOutput.FileName += "_" + PackNumberPlaceholder;
                 }
 
                 fileOutput.InitialDirectory = txtFolder.Text;
                 if (fileOutput.ShowDialog() == DialogResult.OK)
                 {
                     bool splitByFolder = splitBySubfolderToolStripMenuItem.Checked || splitByFolderToolStripMenuItem.Checked;
-                    if (splitByFolder && !fileOutput.FileName.Contains(BatchNumberPlaceholder))
+                    if (splitByFolder && !fileOutput.FileName.Contains(PackNumberPlaceholder))
                     {
                         String folder = splitByFolderToolStripMenuItem.Checked ? "folder" : "subfolder";
                         MessageBox.Show($"You have selected to split the pack by {folder}, but the file name does not contain the placeholder for the {folder} name. A unique file name is not guaranteed without this.\n\n" +
-                                        $"Please add {{{BatchFolderPlaceholder}}} somewhere in the file name.",
+                                        $"Please add {{{PackFolderPlaceholder}}} somewhere in the file name.",
                                         Text + " - Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
@@ -1100,10 +1099,10 @@ namespace Nautilus
                         return;
                     }
 
-                    if (fileBatchNames.Count > 1 && !fileOutput.FileName.Contains(BatchNumberPlaceholder))
+                    if (inputFilePackPaths.Count > 1 && !fileOutput.FileName.Contains(PackNumberPlaceholder))
                     {
                         MessageBox.Show("We need to split the files into multiple 4GB packs, but the file name does not contain the placeholder for the pack number.  A unique file name is not guaranteed without this.\n\n" +
-                                        $"Please add {{{BatchNumberPlaceholder}}} somewhere in the file name.",
+                                        $"Please add {{{PackNumberPlaceholder}}} somewhere in the file name.",
                                         " - Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
@@ -1114,14 +1113,14 @@ namespace Nautilus
                     }
 
                     xOut = fileOutput.FileName;
-                    xOutBatchTemplate = xOut;
+                    xOutPackPathTemplate = xOut;
 
-                    // We've already calculated the files in each batch,
-                    // now that xOutBatchTemplate is set we can calculate the what each pack's filename will be
-                    populateFileBatchNames();
-                    currentBatchIndex = 0;
+                    // We've already calculated the files in each pack,
+                    // now that xOutPackPathTemplate is set we can calculate the what each pack's target path will be
+                    populatePackPaths();
+                    currentPackIndex = 0;
 
-                    if (fileBatches.Count > 1 && ListBoxDialog("These packs will be created:", fileBatchNames, Text + " - Packs") != DialogResult.OK)
+                    if (inputFilePacks.Count > 1 && ListBoxDialog("These packs will be created:", inputFilePackPaths, Text + " - Packs") != DialogResult.OK)
                     {
                         Log("Process cancelled");
                         toolTip1.SetToolTip(btnBegin, "Click to create pack");
@@ -1262,22 +1261,22 @@ namespace Nautilus
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             sOpenPackage = "";
-            if (fileBatches.Count > 1)
+            if (inputFilePacks.Count > 1)
             {
-                xOut = fileBatchNames[currentBatchIndex];
+                xOut = inputFilePackPaths[currentPackIndex];
                 if (File.Exists(xOut))
                 {
                     var response = MessageBox.Show($"The file {xOut} already exists, do you want to overwrite it?", Text + " - File Exists", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (response == DialogResult.No)
                     {
                         Log($"User chose to skip ${xOut}");
-                        // Set this so that the RunWorkerCompleted event handler will continue processing the next batch
-                        // If the batch processing was interrupted for some reason, this should allow the user to continue where they left off
+                        // Set this so that the RunWorkerCompleted event handler will continue processing the next pack
+                        // If the split pack processing was interrupted for some reason, this should allow the user to continue where they left off
                         sOpenPackage = xOut;
                         return;
                     }
                 }
-                Log($"I am writing the next batch pack to:");
+                Log($"I am writing the next split pack to:");
                 Log(xOut);
             }
 
@@ -1340,9 +1339,9 @@ namespace Nautilus
 
             Log("Beginning to add files to the pack");
 
-            if (fileBatches.Count > 1)
+            if (inputFilePacks.Count > 1)
             {
-                // Re-initialize the packfiles so that they don't get included in the next batch
+                // Re-initialize the packfiles so that they don't get included in the next split pack
                 packfiles = new CreateSTFS();
             }
 
@@ -1374,7 +1373,7 @@ namespace Nautilus
                 packfiles.HeaderData.ThisType = PackageType.MarketPlace;
             }
 
-            packfiles.HeaderData.Title_Display = formatBatchTemplateName(txtTitle.Text, currentBatchIndex, getFolderBatchName(fileBatches[currentBatchIndex][0]));
+            packfiles.HeaderData.Title_Display = formatPackPathTemplate(txtTitle.Text, currentPackIndex, getPackNameByFolder(inputFilePacks[currentPackIndex][0]));
             packfiles.HeaderData.Description = txtDesc.Text;
             packfiles.HeaderData.ContentImageBinary = picContent.Image.ImageToBytes(ImageFormat.Png);
             packfiles.HeaderData.PackageImageBinary = picPackage.Image.ImageToBytes(ImageFormat.Png);
@@ -1451,7 +1450,7 @@ namespace Nautilus
             
             if (success)
             {
-                if (currentBatchIndex == fileBatches.Count - 1)
+                if (currentPackIndex == inputFilePacks.Count - 1)
                 {
                     Log("Done!");
                     endTime = DateTime.Now;
@@ -1479,21 +1478,21 @@ namespace Nautilus
                 return;
             }
 
-            // Are we done with the last batch?
-            if (currentBatchIndex == fileBatches.Count - 1)
+            // Are we done with the last pack?
+            if (currentPackIndex == inputFilePacks.Count - 1)
             {
                 onWorkerFinished();
 
-                if (fileBatches.Count > 1)
+                if (inputFilePacks.Count > 1)
                 {
-                    Log("All pack batches finished processing");
+                    Log("All split packs finished processing");
 
                 }
             }
             else
             {
-                // Run next batch
-                currentBatchIndex++;
+                // Process next pack
+                currentPackIndex++;
                 backgroundWorker1.RunWorkerAsync();
             }
         }
@@ -1508,7 +1507,7 @@ namespace Nautilus
             btnBegin.Text = "&Begin";
 
             // The View Package button only makes sense if there's one package generated
-            if (fileBatches.Count == 1)
+            if (inputFilePacks.Count == 1)
             {
                 btnViewPackage.Visible = true;
             }
@@ -2047,10 +2046,10 @@ namespace Nautilus
             {
                 permanentlyDeleteTempFiles.Checked = false;
 
-                // If we've already selected a folder then batches need to be recalculated
-                if (fileBatches.Count > 1)
+                // If we've already selected a folder then files in each pack need to be recalculated
+                if (inputFilePacks.Count > 1)
                 {
-                    populateFileBatches();
+                    populatePacks();
                 }
             }
         }
@@ -2067,23 +2066,23 @@ namespace Nautilus
         {
             if (splitByFolderToolStripMenuItem.Checked)
             {
-                if (!txtTitle.Text.Contains(BatchFolderPlaceholder))
+                if (!txtTitle.Text.Contains(PackFolderPlaceholder))
                 {
                     string space = txtTitle.Text.Length > 0 ? " " : "";
-                    txtTitle.Text += space + BatchFolderPlaceholder;
+                    txtTitle.Text += space + PackFolderPlaceholder;
                 }
 
                 splitBySubfolderToolStripMenuItem.Checked = false;
             }   
             else
             {
-                txtTitle.Text = txtTitle.Text.Replace(BatchFolderPlaceholder, "");
+                txtTitle.Text = txtTitle.Text.Replace(PackFolderPlaceholder, "");
             }
 
-            // Batch splits have to change if they've already been calculated
-            if (fileBatches.Count > 1)
+            // Pack splits have to be re-calculated if they've already been calculated
+            if (inputFilePacks.Count > 1)
             {
-                populateFileBatches();
+                populatePacks();
             }
         }
 
@@ -2091,23 +2090,23 @@ namespace Nautilus
         {
             if (splitBySubfolderToolStripMenuItem.Checked)
             {
-                if (!txtTitle.Text.Contains(BatchFolderPlaceholder))
+                if (!txtTitle.Text.Contains(PackFolderPlaceholder))
                 {
                     string space = txtTitle.Text.Length > 0 ? " " : "";
-                    txtTitle.Text += space + BatchFolderPlaceholder;
+                    txtTitle.Text += space + PackFolderPlaceholder;
                 }
 
                 splitByFolderToolStripMenuItem.Checked = false;
             }
             else
             {
-                txtTitle.Text = txtTitle.Text.Replace(BatchFolderPlaceholder, "");
+                txtTitle.Text = txtTitle.Text.Replace(PackFolderPlaceholder, "");
             }
 
-            // Batch splits have to change if they've already been calculated
-            if (fileBatches.Count > 1)
+            // Pack splits have to be re-calculated if they've already been calculated
+            if (inputFilePacks.Count > 1)
             {
-                populateFileBatches();
+                populatePacks();
             }
         }
     }

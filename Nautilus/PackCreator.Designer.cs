@@ -63,7 +63,9 @@
             this.useExistingFolderStructureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.useRecursiveSearching = new System.Windows.Forms.ToolStripMenuItem();
             this.batchProcessingMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitByFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitBySubfolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.permanentlyDeleteTempFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.setGameIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,8 +90,6 @@
             this.btnRB1 = new System.Windows.Forms.Button();
             this.btnRB2 = new System.Windows.Forms.Button();
             this.btnRB3 = new System.Windows.Forms.Button();
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.splitBySubfolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumb10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumb9)).BeginInit();
@@ -574,7 +574,18 @@
             this.permanentlyDeleteTempFiles});
             this.batchProcessingMenu.Name = "batchProcessingMenu";
             this.batchProcessingMenu.Size = new System.Drawing.Size(334, 34);
-            this.batchProcessingMenu.Text = "Batch processing";
+            this.batchProcessingMenu.Text = "Pack splitting options";
+            // 
+            // splitInto4GBPacksIfRequiredToolStripMenuItem
+            // 
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Checked = true;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Enabled = false;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Name = "splitInto4GBPacksIfRequiredToolStripMenuItem";
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Text = "Split at the 4GB size limit";
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.ToolTipText = "Multiple packs will be created if the file size total exceeds 4GB";
             // 
             // splitByFolderToolStripMenuItem
             // 
@@ -585,6 +596,18 @@
             this.splitByFolderToolStripMenuItem.Text = "Split by folders";
             this.splitByFolderToolStripMenuItem.ToolTipText = "A separate pack will be created for each top-level folder";
             this.splitByFolderToolStripMenuItem.CheckedChanged += new System.EventHandler(this.splitByFolderToolStripMenuItem_CheckedChanged);
+            // 
+            // splitBySubfolderToolStripMenuItem
+            // 
+            this.splitBySubfolderToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.splitBySubfolderToolStripMenuItem.CheckOnClick = true;
+            this.splitBySubfolderToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.splitBySubfolderToolStripMenuItem.Name = "splitBySubfolderToolStripMenuItem";
+            this.splitBySubfolderToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
+            this.splitBySubfolderToolStripMenuItem.Text = "Split by subfolders";
+            this.splitBySubfolderToolStripMenuItem.ToolTipText = "A separate pack will be created for any subfolders located in the top-level folde" +
+    "rs";
+            this.splitBySubfolderToolStripMenuItem.CheckedChanged += new System.EventHandler(this.splitBySubfolderToolStripMenuItem_CheckedChanged);
             // 
             // permanentlyDeleteTempFiles
             // 
@@ -866,29 +889,6 @@
             this.btnRB3.Text = "RB3";
             this.btnRB3.UseVisualStyleBackColor = true;
             this.btnRB3.Click += new System.EventHandler(this.btnRB3_Click);
-            // 
-            // splitInto4GBPacksIfRequiredToolStripMenuItem
-            // 
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Checked = true;
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Enabled = false;
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Name = "splitInto4GBPacksIfRequiredToolStripMenuItem";
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Text = "Split at the 4GB size limit";
-            this.splitInto4GBPacksIfRequiredToolStripMenuItem.ToolTipText = "Multiple packs will be created if the file size total exceeds 4GB";
-            // 
-            // splitBySubfolderToolStripMenuItem
-            // 
-            this.splitBySubfolderToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.splitBySubfolderToolStripMenuItem.CheckOnClick = true;
-            this.splitBySubfolderToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.splitBySubfolderToolStripMenuItem.Name = "splitBySubfolderToolStripMenuItem";
-            this.splitBySubfolderToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
-            this.splitBySubfolderToolStripMenuItem.Text = "Split by subfolders";
-            this.splitBySubfolderToolStripMenuItem.ToolTipText = "A separate pack will be created for any subfolders located in the top-level folde" +
-    "rs";
-            this.splitBySubfolderToolStripMenuItem.CheckedChanged += new System.EventHandler(this.splitBySubfolderToolStripMenuItem_CheckedChanged);
             // 
             // PackCreator
             // 
