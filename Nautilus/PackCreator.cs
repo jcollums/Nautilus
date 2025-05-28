@@ -1030,6 +1030,7 @@ namespace Nautilus
 
         /// <summary>
         /// Displays a simple dialog with a ListBox containing the provided list items, allowing the user to approve or disapprove.
+        /// The intention is to show the user what packs with be created so that they can cancel and choose a different naming scheme.
         /// </summary>
         private DialogResult ListBoxDialog(string message, List<string> listItems, string caption)
         {
