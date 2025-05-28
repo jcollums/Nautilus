@@ -326,6 +326,9 @@ namespace Nautilus
             }
         }
 
+        /// <summary>
+        /// Produces a pack file name based on the folder that contains the current file.
+        /// </summary>
         private string getPackNameByFolder(string filePath)
         {
             string relativePath = filePath.Replace(txtFolder.Text + "\\", "").Replace(Path.GetFileName(filePath), "").Replace("\\\\", "");
@@ -349,12 +352,29 @@ namespace Nautilus
             return null;
         }
 
+        /// <summary>
+        /// Produces something similar to a Rock Band pack number based on the index of the pack.
+        /// </summary>
+        /// <remarks>
+        /// <code>
+        /// formatPackIndex(0) => "01"
+        /// </code>
+        /// </remarks>
         private string formatPackIndex(int packIndex) 
         {
             // 01, 02, 03, etc.
             return (packIndex + 1).ToString().PadLeft(2, '0');
         }
 
+        /// <summary>
+        /// Replaces the placeholders in the user's chosen file output path,
+        /// including the pack number and/or folder based on split options
+        /// </summary>
+        /// <remarks>
+        /// <code>
+        /// template = "{Folder} {Pack#}" => "FolderName_01"
+        /// </code>
+        /// </remarks>
         private string formatPackPathTemplate(string template, int packIndex, string folder)
         {
             string result = template;
@@ -367,6 +387,20 @@ namespace Nautilus
             return result;
         }
 
+        /// <summary>
+        /// Splits the <c>inputFiles</c> list into multiple packs based on the maximum pack size (4GB)
+        /// and the file's folder/subfolder depending on splitting options selected.
+        /// The resulting split list of files are stored in <c>inputFilePacks</c>.
+        /// </summary>
+        /// <remarks>
+        /// Example output might include:
+        /// <code>
+        /// inputFilesPacks = [
+        ///     ["song1_con", "song2_.con", ...],
+        ///     ["song100_con", "song101_con", ...]
+        /// ]
+        /// </code>
+        /// </remarks>
         private void populatePacks()
         {
             List<string> currentPack = new List<string>();
@@ -441,6 +475,25 @@ namespace Nautilus
             EnableDisable(true);
         }
 
+        /// <summary>
+        /// Populates the <c>inputFilePackPaths</c> list with the output file paths for each split pack,
+        /// based on <c>xOutPackPathTemplate</c>, which will be a static string if there's only one pack,
+        /// or a formatted template string with folder and/or pack number if there are multiple packs.
+        /// This method should be called after <c>populatePacks</c> and <c>xOutPackPathTemplate</c>
+        /// have been set, which would be after the user clicks Begin and chooses Save on the file dialog.
+        /// </summary>
+        /// <remarks>
+        /// Example output might include:
+        /// <code>
+        /// inputFilesPacks = [
+        ///     "C:\\OutputDir\\Folder1_01",
+        ///     "C:\\OutputDir\\Folder1_02",
+        ///     "C:\\OutputDir\\Folder1_03",
+        ///     "C:\\OutputDir\\Folder2_01",
+        ///     "C:\\OutputDir\\Folder3_01"
+        /// ]
+        /// </code>
+        /// </remarks>
         private void populatePackPaths()
         {
             string prevFolder = getPackNameByFolder(inputFiles[0]);
@@ -975,6 +1028,9 @@ namespace Nautilus
             btnShowHide.Visible = enabled;
         }
 
+        /// <summary>
+        /// Displays a simple dialog with a ListBox containing the provided list items, allowing the user to approve or disapprove.
+        /// </summary>
         private DialogResult ListBoxDialog(string message, List<string> listItems, string caption)
         {
             Form listForm = new Form()
@@ -1341,7 +1397,7 @@ namespace Nautilus
 
             if (inputFilePacks.Count > 1)
             {
-                // Re-initialize the packfiles so that they don't get included in the next split pack
+                // Re-initialize the packfiles so that files from the last pack don't get included in the next split pack
                 packfiles = new CreateSTFS();
             }
 
@@ -2054,6 +2110,9 @@ namespace Nautilus
             }
         }
 
+        /// <summary>
+        /// Ensures that the Permanently Delete Temp Files option and Keep Files option are mutually exclusive.
+        /// </summary>
         private void permanentlyDeleteTempFiles_CheckedChanged(object sender, EventArgs e)
         {
             if (permanentlyDeleteTempFiles.Checked)
@@ -2062,6 +2121,10 @@ namespace Nautilus
             }
         }
 
+        /// <summary>
+        /// Ensures that Split by folder option and Split by subfolder option are mutually exclusive,
+        /// and does any reprocessing of pack files when necessary
+        /// </summary>
         private void splitByFolderToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             if (splitByFolderToolStripMenuItem.Checked)
@@ -2086,6 +2149,10 @@ namespace Nautilus
             }
         }
 
+        /// <summary>
+        /// Ensures that Split by folder option and Split by subfolder option are mutually exclusive,
+        /// and does any reprocessing of pack files when necessary
+        /// </summary> 
         private void splitBySubfolderToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             if (splitBySubfolderToolStripMenuItem.Checked)
