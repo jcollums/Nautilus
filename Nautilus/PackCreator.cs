@@ -2101,17 +2101,14 @@ namespace Nautilus
             rockBand3ToolStripMenuItem_Click(sender, e);
         }
 
+        /// <summary>
+        /// Ensures that the Permanently Delete Temp Files option and Keep Files option are mutually exclusive.
+        /// </summary>
         private void chkKeepFiles_CheckedChanged(object sender, EventArgs e)
         {
             if (chkKeepFiles.Checked)
             {
                 permanentlyDeleteTempFiles.Checked = false;
-
-                // If we've already selected a folder then files in each pack need to be recalculated
-                if (inputFilePacks.Count > 1)
-                {
-                    populatePacks();
-                }
             }
         }
 
