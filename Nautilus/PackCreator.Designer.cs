@@ -62,6 +62,9 @@
             this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.useExistingFolderStructureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.useRecursiveSearching = new System.Windows.Forms.ToolStripMenuItem();
+            this.batchProcessingMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitByFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.permanentlyDeleteTempFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.setGameIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rockBandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +73,7 @@
             this.setDTAEncodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aNSIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTF8ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnReset = new System.Windows.Forms.Button();
@@ -84,8 +88,8 @@
             this.btnRB1 = new System.Windows.Forms.Button();
             this.btnRB2 = new System.Windows.Forms.Button();
             this.btnRB3 = new System.Windows.Forms.Button();
-            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
-            this.permanentlyDeleteTempFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitBySubfolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumb10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumb9)).BeginInit();
@@ -150,7 +154,7 @@
             this.txtFolder.Location = new System.Drawing.Point(4, 59);
             this.txtFolder.Name = "txtFolder";
             this.txtFolder.ReadOnly = true;
-            this.txtFolder.Size = new System.Drawing.Size(400, 20);
+            this.txtFolder.Size = new System.Drawing.Size(400, 26);
             this.txtFolder.TabIndex = 13;
             this.txtFolder.TextChanged += new System.EventHandler(this.txtFolder_TextChanged);
             this.txtFolder.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
@@ -164,9 +168,10 @@
             this.lstLog.ContextMenuStrip = this.contextMenuStrip1;
             this.lstLog.FormattingEnabled = true;
             this.lstLog.HorizontalScrollbar = true;
+            this.lstLog.ItemHeight = 20;
             this.lstLog.Location = new System.Drawing.Point(4, 352);
             this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(400, 119);
+            this.lstLog.Size = new System.Drawing.Size(400, 122);
             this.lstLog.TabIndex = 12;
             this.lstLog.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
             this.lstLog.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
@@ -174,17 +179,18 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exportLogFileToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(123, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(170, 36);
             // 
             // exportLogFileToolStripMenuItem
             // 
             this.exportLogFileToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.exportLogFileToolStripMenuItem.Name = "exportLogFileToolStripMenuItem";
-            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.exportLogFileToolStripMenuItem.Size = new System.Drawing.Size(169, 32);
             this.exportLogFileToolStripMenuItem.Text = "Export log file";
             this.exportLogFileToolStripMenuItem.Click += new System.EventHandler(this.exportLogFileToolStripMenuItem_Click);
             // 
@@ -224,7 +230,7 @@
             this.radioLIVE.Cursor = System.Windows.Forms.Cursors.Hand;
             this.radioLIVE.Location = new System.Drawing.Point(184, 289);
             this.radioLIVE.Name = "radioLIVE";
-            this.radioLIVE.Size = new System.Drawing.Size(81, 17);
+            this.radioLIVE.Size = new System.Drawing.Size(121, 24);
             this.radioLIVE.TabIndex = 24;
             this.radioLIVE.Text = "LIVE (RGH)";
             this.radioLIVE.UseVisualStyleBackColor = false;
@@ -237,7 +243,7 @@
             this.radioCON.Cursor = System.Windows.Forms.Cursors.Hand;
             this.radioCON.Location = new System.Drawing.Point(83, 289);
             this.radioCON.Name = "radioCON";
-            this.radioCON.Size = new System.Drawing.Size(84, 17);
+            this.radioCON.Size = new System.Drawing.Size(123, 24);
             this.radioCON.TabIndex = 23;
             this.radioCON.TabStop = true;
             this.radioCON.Text = "CON (Retail)";
@@ -281,7 +287,7 @@
             this.label2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(4, 86);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(224, 19);
+            this.label2.Size = new System.Drawing.Size(357, 27);
             this.label2.TabIndex = 27;
             this.label2.Text = "Enter a name for your custom pack:";
             // 
@@ -291,7 +297,7 @@
             this.label4.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(4, 186);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(258, 19);
+            this.label4.Size = new System.Drawing.Size(411, 27);
             this.label4.TabIndex = 28;
             this.label4.Text = "Enter a description for your custom pack:";
             // 
@@ -502,22 +508,25 @@
             this.chkKeepFiles.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkKeepFiles.Location = new System.Drawing.Point(4, 320);
             this.chkKeepFiles.Name = "chkKeepFiles";
-            this.chkKeepFiles.Size = new System.Drawing.Size(232, 23);
+            this.chkKeepFiles.Size = new System.Drawing.Size(367, 31);
             this.chkKeepFiles.TabIndex = 31;
             this.chkKeepFiles.Text = "Keep extracted files for future use";
             this.chkKeepFiles.UseVisualStyleBackColor = true;
+            this.chkKeepFiles.CheckedChanged += new System.EventHandler(this.chkKeepFiles_CheckedChanged);
             this.chkKeepFiles.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
             this.chkKeepFiles.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
             // 
             // menuStrip1
             // 
             this.menuStrip1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.advancedToolStripMenuItem,
             this.helpToolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(590, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(590, 33);
             this.menuStrip1.TabIndex = 35;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -526,20 +535,20 @@
             this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.useExistingFolderStructureToolStripMenuItem,
             this.useRecursiveSearching,
-            this.permanentlyDeleteTempFiles,
+            this.batchProcessingMenu,
             this.toolStripMenuItem1,
             this.setGameIDToolStripMenuItem,
             this.setDTAEncodingToolStripMenuItem,
             this.hidePackFromRB3});
             this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
-            this.advancedToolStripMenuItem.Size = new System.Drawing.Size(72, 20);
+            this.advancedToolStripMenuItem.Size = new System.Drawing.Size(107, 29);
             this.advancedToolStripMenuItem.Text = "&Advanced";
             // 
             // useExistingFolderStructureToolStripMenuItem
             // 
             this.useExistingFolderStructureToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.useExistingFolderStructureToolStripMenuItem.Name = "useExistingFolderStructureToolStripMenuItem";
-            this.useExistingFolderStructureToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.useExistingFolderStructureToolStripMenuItem.Size = new System.Drawing.Size(334, 34);
             this.useExistingFolderStructureToolStripMenuItem.Text = "Use e&xisting folder structure";
             this.useExistingFolderStructureToolStripMenuItem.Click += new System.EventHandler(this.useExistingFolderStructureToolStripMenuItem_Click);
             // 
@@ -550,14 +559,48 @@
             this.useRecursiveSearching.CheckOnClick = true;
             this.useRecursiveSearching.CheckState = System.Windows.Forms.CheckState.Checked;
             this.useRecursiveSearching.Name = "useRecursiveSearching";
-            this.useRecursiveSearching.Size = new System.Drawing.Size(221, 22);
+            this.useRecursiveSearching.Size = new System.Drawing.Size(334, 34);
             this.useRecursiveSearching.Text = "Use recursive searching";
             this.useRecursiveSearching.Click += new System.EventHandler(this.useRecursiveSearching_Click);
+            // 
+            // batchProcessingMenu
+            // 
+            this.batchProcessingMenu.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.batchProcessingMenu.CheckOnClick = true;
+            this.batchProcessingMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem,
+            this.splitByFolderToolStripMenuItem,
+            this.splitBySubfolderToolStripMenuItem,
+            this.permanentlyDeleteTempFiles});
+            this.batchProcessingMenu.Name = "batchProcessingMenu";
+            this.batchProcessingMenu.Size = new System.Drawing.Size(334, 34);
+            this.batchProcessingMenu.Text = "Batch processing";
+            // 
+            // splitByFolderToolStripMenuItem
+            // 
+            this.splitByFolderToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.splitByFolderToolStripMenuItem.CheckOnClick = true;
+            this.splitByFolderToolStripMenuItem.Name = "splitByFolderToolStripMenuItem";
+            this.splitByFolderToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
+            this.splitByFolderToolStripMenuItem.Text = "Split by folders";
+            this.splitByFolderToolStripMenuItem.ToolTipText = "A separate pack will be created for each top-level folder";
+            this.splitByFolderToolStripMenuItem.CheckedChanged += new System.EventHandler(this.splitByFolderToolStripMenuItem_CheckedChanged);
+            // 
+            // permanentlyDeleteTempFiles
+            // 
+            this.permanentlyDeleteTempFiles.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.permanentlyDeleteTempFiles.CheckOnClick = true;
+            this.permanentlyDeleteTempFiles.Name = "permanentlyDeleteTempFiles";
+            this.permanentlyDeleteTempFiles.Size = new System.Drawing.Size(347, 34);
+            this.permanentlyDeleteTempFiles.Text = "Permanently delete temp files";
+            this.permanentlyDeleteTempFiles.ToolTipText = "Temp files will not go to the Recycle Bin. Mutually exclusive with \"Keep extracte" +
+    "d files\"";
+            this.permanentlyDeleteTempFiles.CheckedChanged += new System.EventHandler(this.permanentlyDeleteTempFiles_CheckedChanged);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(218, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(331, 6);
             // 
             // setGameIDToolStripMenuItem
             // 
@@ -567,14 +610,14 @@
             this.rockBand2ToolStripMenuItem,
             this.rockBand3ToolStripMenuItem});
             this.setGameIDToolStripMenuItem.Name = "setGameIDToolStripMenuItem";
-            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.setGameIDToolStripMenuItem.Size = new System.Drawing.Size(334, 34);
             this.setGameIDToolStripMenuItem.Text = "Set game ID";
             // 
             // rockBandToolStripMenuItem
             // 
             this.rockBandToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.rockBandToolStripMenuItem.Name = "rockBandToolStripMenuItem";
-            this.rockBandToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.rockBandToolStripMenuItem.Size = new System.Drawing.Size(212, 34);
             this.rockBandToolStripMenuItem.Text = "Rock Band";
             this.rockBandToolStripMenuItem.Click += new System.EventHandler(this.rockBandToolStripMenuItem_Click);
             // 
@@ -582,7 +625,7 @@
             // 
             this.rockBand2ToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.rockBand2ToolStripMenuItem.Name = "rockBand2ToolStripMenuItem";
-            this.rockBand2ToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.rockBand2ToolStripMenuItem.Size = new System.Drawing.Size(212, 34);
             this.rockBand2ToolStripMenuItem.Text = "Rock Band 2";
             this.rockBand2ToolStripMenuItem.Click += new System.EventHandler(this.rockBand2ToolStripMenuItem_Click);
             // 
@@ -592,7 +635,7 @@
             this.rockBand3ToolStripMenuItem.Checked = true;
             this.rockBand3ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.rockBand3ToolStripMenuItem.Name = "rockBand3ToolStripMenuItem";
-            this.rockBand3ToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.rockBand3ToolStripMenuItem.Size = new System.Drawing.Size(212, 34);
             this.rockBand3ToolStripMenuItem.Text = "Rock Band 3";
             this.rockBand3ToolStripMenuItem.Click += new System.EventHandler(this.rockBand3ToolStripMenuItem_Click);
             // 
@@ -603,14 +646,14 @@
             this.aNSIToolStripMenuItem,
             this.uTF8ToolStripMenuItem});
             this.setDTAEncodingToolStripMenuItem.Name = "setDTAEncodingToolStripMenuItem";
-            this.setDTAEncodingToolStripMenuItem.Size = new System.Drawing.Size(221, 22);
+            this.setDTAEncodingToolStripMenuItem.Size = new System.Drawing.Size(334, 34);
             this.setDTAEncodingToolStripMenuItem.Text = "Set DTA encoding";
             // 
             // aNSIToolStripMenuItem
             // 
             this.aNSIToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.aNSIToolStripMenuItem.Name = "aNSIToolStripMenuItem";
-            this.aNSIToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.aNSIToolStripMenuItem.Size = new System.Drawing.Size(154, 34);
             this.aNSIToolStripMenuItem.Text = "ANSI";
             this.aNSIToolStripMenuItem.Click += new System.EventHandler(this.aNSIToolStripMenuItem_Click);
             // 
@@ -620,14 +663,22 @@
             this.uTF8ToolStripMenuItem.Checked = true;
             this.uTF8ToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.uTF8ToolStripMenuItem.Name = "uTF8ToolStripMenuItem";
-            this.uTF8ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.uTF8ToolStripMenuItem.Size = new System.Drawing.Size(154, 34);
             this.uTF8ToolStripMenuItem.Text = "UTF8";
             this.uTF8ToolStripMenuItem.Click += new System.EventHandler(this.uTF8ToolStripMenuItem_Click);
+            // 
+            // hidePackFromRB3
+            // 
+            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.hidePackFromRB3.CheckOnClick = true;
+            this.hidePackFromRB3.Name = "hidePackFromRB3";
+            this.hidePackFromRB3.Size = new System.Drawing.Size(334, 34);
+            this.hidePackFromRB3.Text = "Hide pack from RB3";
             // 
             // helpToolStripMenuItem1
             // 
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
-            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(65, 29);
             this.helpToolStripMenuItem1.Text = "&Help";
             this.helpToolStripMenuItem1.Click += new System.EventHandler(this.helpToolStripMenuItem1_Click);
             // 
@@ -816,21 +867,28 @@
             this.btnRB3.UseVisualStyleBackColor = true;
             this.btnRB3.Click += new System.EventHandler(this.btnRB3_Click);
             // 
-            // hidePackFromRB3
+            // splitInto4GBPacksIfRequiredToolStripMenuItem
             // 
-            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.hidePackFromRB3.CheckOnClick = true;
-            this.hidePackFromRB3.Name = "hidePackFromRB3";
-            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
-            this.hidePackFromRB3.Text = "Hide pack from RB3";
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Checked = true;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Enabled = false;
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Name = "splitInto4GBPacksIfRequiredToolStripMenuItem";
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.Text = "Split at the 4GB size limit";
+            this.splitInto4GBPacksIfRequiredToolStripMenuItem.ToolTipText = "Multiple packs will be created if the file size total exceeds 4GB";
             // 
-            // permanentlyDeleteTempFiles
+            // splitBySubfolderToolStripMenuItem
             // 
-            this.permanentlyDeleteTempFiles.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.permanentlyDeleteTempFiles.CheckOnClick = true;
-            this.permanentlyDeleteTempFiles.Name = "permanentlyDeleteTempFiles";
-            this.permanentlyDeleteTempFiles.Size = new System.Drawing.Size(231, 22);
-            this.permanentlyDeleteTempFiles.Text = "Permanently delete temp files";
+            this.splitBySubfolderToolStripMenuItem.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.splitBySubfolderToolStripMenuItem.CheckOnClick = true;
+            this.splitBySubfolderToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.splitBySubfolderToolStripMenuItem.Name = "splitBySubfolderToolStripMenuItem";
+            this.splitBySubfolderToolStripMenuItem.Size = new System.Drawing.Size(347, 34);
+            this.splitBySubfolderToolStripMenuItem.Text = "Split by subfolders";
+            this.splitBySubfolderToolStripMenuItem.ToolTipText = "A separate pack will be created for any subfolders located in the top-level folde" +
+    "rs";
+            this.splitBySubfolderToolStripMenuItem.CheckedChanged += new System.EventHandler(this.splitBySubfolderToolStripMenuItem_CheckedChanged);
             // 
             // PackCreator
             // 
@@ -955,6 +1013,10 @@
         private System.Windows.Forms.Button btnRB2;
         private System.Windows.Forms.Button btnRB3;
         private System.Windows.Forms.ToolStripMenuItem hidePackFromRB3;
+        private System.Windows.Forms.ToolStripMenuItem batchProcessingMenu;
+        private System.Windows.Forms.ToolStripMenuItem splitByFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem permanentlyDeleteTempFiles;
+        private System.Windows.Forms.ToolStripMenuItem splitInto4GBPacksIfRequiredToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem splitBySubfolderToolStripMenuItem;
     }
 }
