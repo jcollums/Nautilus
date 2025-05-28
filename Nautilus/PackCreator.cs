@@ -1149,9 +1149,7 @@ namespace Nautilus
                                         Text + " - Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
-                        toolTip1.SetToolTip(btnBegin, "Click to create pack");
-                        btnBegin.Text = "&Begin";
-                        EnableDisable(true);
+                        enableBeginUI();
                         return;
                     }
 
@@ -1162,9 +1160,7 @@ namespace Nautilus
                                         " - Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
-                        toolTip1.SetToolTip(btnBegin, "Click to create pack");
-                        btnBegin.Text = "&Begin";
-                        EnableDisable(true);
+                        enableBeginUI();
                         return;
                     }
 
@@ -1179,9 +1175,7 @@ namespace Nautilus
                     if (inputFilePacks.Count > 1 && ListBoxDialog("These packs will be created:", inputFilePackPaths, Text + " - Packs") != DialogResult.OK)
                     {
                         Log("Process cancelled");
-                        toolTip1.SetToolTip(btnBegin, "Click to create pack");
-                        btnBegin.Text = "&Begin";
-                        EnableDisable(true);
+                        enableBeginUI();
                         return;
                     }
 
@@ -1192,9 +1186,7 @@ namespace Nautilus
                 }
                 else
                 {
-                    toolTip1.SetToolTip(btnBegin, "Click to create pack");
-                    btnBegin.Text = "&Begin";
-                    EnableDisable(true);
+                    enableBeginUI();
                     Log("Process cancelled");
                 }
             }
@@ -1203,6 +1195,16 @@ namespace Nautilus
                 Log("There was an error: " + ex.Message);
                 EnableDisable(true);
             }
+        }
+
+        /// <summary>
+        /// Resets the begin button state so user can start the process again.
+        /// </summary>
+        private void enableBeginUI()
+        {
+            toolTip1.SetToolTip(btnBegin, "Click to create pack");
+            btnBegin.Text = "&Begin";
+            EnableDisable(true);
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -1491,11 +1493,11 @@ namespace Nautilus
                     {
 
                         if (permanentlyDeleteTempFiles.Checked) {
-                            Tools.DeleteFolder(tempFolder, true); //delete files permanently
+                            Tools.DeleteFolder(tempFolder, true); // delete files permanently
                         } else {
-                            Tools.SendtoTrash(tempFolder, true); //send files to recycle bin
+                            Tools.SendtoTrash(tempFolder, true); // send files to recycle bin
                         }
-                        Directory.CreateDirectory(tempFolder); //restore empty extracted folder (requested by C16)
+                        Directory.CreateDirectory(tempFolder); // restore empty extracted folder (requested by C16)
                     }
                     catch
                     {
