@@ -362,20 +362,19 @@ namespace Nautilus
         /// </remarks>
         private string formatPackIndex(int packIndex) 
         {
-            // 01, 02, 03, etc.
             return (packIndex + 1).ToString().PadLeft(2, '0');
         }
 
         /// <summary>
-        /// Replaces the placeholders in the user's chosen file output path,
+        /// Replaces the placeholders in the user's chosen file output path (or anything that includes the placeholders),
         /// including the pack number and/or folder based on split options
         /// </summary>
         /// <remarks>
         /// <code>
-        /// template = "{Folder} {Pack#}" => "FolderName_01"
+        /// template = "C:\\{Folder}_{Pack#}" => "C:\\FolderName_01"
         /// </code>
         /// </remarks>
-        private string formatPackPathTemplate(string template, int packIndex, string folder)
+        private string formatPackTemplate(string template, int packIndex, string folder)
         {
             string result = template;
 
@@ -509,7 +508,7 @@ namespace Nautilus
                 {
                     packIndex = 0;
                 }
-                inputFilePackPaths.Add(formatPackPathTemplate(xOutPackPathTemplate, packIndex, currentFolder));
+                inputFilePackPaths.Add(formatPackTemplate(xOutPackPathTemplate, packIndex, currentFolder));
 
                 packIndex++;
                 prevFolder = currentFolder;
@@ -1430,7 +1429,7 @@ namespace Nautilus
                 packfiles.HeaderData.ThisType = PackageType.MarketPlace;
             }
 
-            packfiles.HeaderData.Title_Display = formatPackPathTemplate(txtTitle.Text, currentPackIndex, getPackNameByFolder(inputFilePacks[currentPackIndex][0]));
+            packfiles.HeaderData.Title_Display = formatPackTemplate(txtTitle.Text, currentPackIndex, getPackNameByFolder(inputFilePacks[currentPackIndex][0]));
             packfiles.HeaderData.Description = txtDesc.Text;
             packfiles.HeaderData.ContentImageBinary = picContent.Image.ImageToBytes(ImageFormat.Png);
             packfiles.HeaderData.PackageImageBinary = picPackage.Image.ImageToBytes(ImageFormat.Png);
@@ -1531,14 +1530,14 @@ namespace Nautilus
             if (string.IsNullOrWhiteSpace(sOpenPackage))
             {
                 // User must have cancelled the operation
-                onWorkerFinished();
+                onWorkerFinishedUI();
                 return;
             }
 
             // Are we done with the last pack?
             if (currentPackIndex == inputFilePacks.Count - 1)
             {
-                onWorkerFinished();
+                onWorkerFinishedUI();
 
                 if (inputFilePacks.Count > 1)
                 {
@@ -1553,8 +1552,11 @@ namespace Nautilus
                 backgroundWorker1.RunWorkerAsync();
             }
         }
-        
-        private void onWorkerFinished()
+
+        /// <summary>
+        /// Sets appropriate UI state when worker has finished processing or processing was cancelled.
+        /// </summary>
+        private void onWorkerFinishedUI()
         {
             picWorking.Visible = false;
             btnReset.Visible = true;
