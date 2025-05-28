@@ -428,7 +428,7 @@ namespace Nautilus
                 Log($"I will create {inputFilePacks.Count} numbered packs split by {folder},");
                 Log($"or split when {folder} is greater than 4GB.");
             }
-            else if (totalSize > MAX_PACK_SIZE)
+            else if (inputFilePacks.Count > 1)
             {
                 var sizeInGB = (decimal)totalSize / GB;
                 Log("Combined input file size is over 4GB limit");
