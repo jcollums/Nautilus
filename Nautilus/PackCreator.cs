@@ -327,66 +327,6 @@ namespace Nautilus
         }
 
         /// <summary>
-        /// Produces a pack file name based on the folder that contains the current file.
-        /// </summary>
-        private string getPackNameByFolder(string filePath)
-        {
-            string relativePath = filePath.Replace(txtFolder.Text + "\\", "").Replace(Path.GetFileName(filePath), "").Replace("\\\\", "");
-            if (relativePath == "")
-            {
-                string[] parts = filePath.Split('\\');
-                relativePath = parts[parts.Length - 2];
-            }
-
-            if (splitByFolderToolStripMenuItem.Checked)
-            {
-                // If the input folder is C:\Games\RockBand\ then this would turn "C:\Games\RockBand\DLC\2x Bass Pedal\confile" into "DLC"
-                return relativePath.Split('\\')[0].Replace(" ", "");
-            }
-            else if (splitBySubfolderToolStripMenuItem.Checked)
-            {
-                // If the input folder is C:\Games\RockBand\ then this would turn "C:\Games\RockBand\DLC\Metal\2x Bass Pedal\confile" into "DLCMetal2xBassPedal"
-                return relativePath.Replace("\\", "").Replace(" ", "");
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Produces something similar to a Rock Band pack number based on the index of the pack.
-        /// </summary>
-        /// <remarks>
-        /// <code>
-        /// formatPackIndex(0) => "01"
-        /// </code>
-        /// </remarks>
-        private string formatPackIndex(int packIndex) 
-        {
-            return (packIndex + 1).ToString().PadLeft(2, '0');
-        }
-
-        /// <summary>
-        /// Replaces the placeholders in the user's chosen file output path (or anything that includes the placeholders),
-        /// including the pack number and/or folder based on split options
-        /// </summary>
-        /// <remarks>
-        /// <code>
-        /// template = "C:\\{Folder}_{Pack#}" => "C:\\FolderName_01"
-        /// </code>
-        /// </remarks>
-        private string formatPackTemplate(string template, int packIndex, string folder)
-        {
-            string result = template;
-
-            result = result.Replace(PackNumberPlaceholder, formatPackIndex(packIndex));
-            if (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked)
-            {
-                result = result.Replace(PackFolderPlaceholder, folder);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Splits the <c>inputFiles</c> list into multiple packs based on the maximum pack size (4GB)
         /// and the file's folder/subfolder depending on splitting options selected.
         /// The resulting split list of files are stored in <c>inputFilePacks</c>.
@@ -513,6 +453,66 @@ namespace Nautilus
                 packIndex++;
                 prevFolder = currentFolder;
             }
+        }
+
+        /// <summary>
+        /// Produces a pack file name based on the folder that contains the current file.
+        /// </summary>
+        private string getPackNameByFolder(string filePath)
+        {
+            string relativePath = filePath.Replace(txtFolder.Text + "\\", "").Replace(Path.GetFileName(filePath), "").Replace("\\\\", "");
+            if (relativePath == "")
+            {
+                string[] parts = filePath.Split('\\');
+                relativePath = parts[parts.Length - 2];
+            }
+
+            if (splitByFolderToolStripMenuItem.Checked)
+            {
+                // If the input folder is C:\Games\RockBand\ then this would turn "C:\Games\RockBand\DLC\2x Bass Pedal\confile" into "DLC"
+                return relativePath.Split('\\')[0].Replace(" ", "");
+            }
+            else if (splitBySubfolderToolStripMenuItem.Checked)
+            {
+                // If the input folder is C:\Games\RockBand\ then this would turn "C:\Games\RockBand\DLC\Metal\2x Bass Pedal\confile" into "DLCMetal2xBassPedal"
+                return relativePath.Replace("\\", "").Replace(" ", "");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Produces something similar to a Rock Band pack number based on the index of the pack.
+        /// </summary>
+        /// <remarks>
+        /// <code>
+        /// formatPackIndex(0) => "01"
+        /// </code>
+        /// </remarks>
+        private string formatPackIndex(int packIndex) 
+        {
+            return (packIndex + 1).ToString().PadLeft(2, '0');
+        }
+
+        /// <summary>
+        /// Replaces the placeholders in the user's chosen file output path (or anything that includes the placeholders),
+        /// including the pack number and/or folder based on split options
+        /// </summary>
+        /// <remarks>
+        /// <code>
+        /// template = "C:\\{Folder}_{Pack#}" => "C:\\FolderName_01"
+        /// </code>
+        /// </remarks>
+        private string formatPackTemplate(string template, int packIndex, string folder)
+        {
+            string result = template;
+
+            result = result.Replace(PackNumberPlaceholder, formatPackIndex(packIndex));
+            if (splitByFolderToolStripMenuItem.Checked || splitBySubfolderToolStripMenuItem.Checked)
+            {
+                result = result.Replace(PackFolderPlaceholder, folder);
+            }
+            return result;
         }
 
         private bool extractRBFiles()
