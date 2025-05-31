@@ -328,6 +328,7 @@
             this.addBlitzSongs = new System.Windows.Forms.ToolStripMenuItem();
             this.panelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetAllPanels = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoResizeList = new System.Windows.Forms.ToolStripMenuItem();
             this.userCanMovePanels = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.toggleSource = new System.Windows.Forms.ToolStripMenuItem();
@@ -473,6 +474,7 @@
             this.toolTip1.SetToolTip(this.picLyrics, "Click to view song lyrics");
             this.picLyrics.Visible = false;
             this.picLyrics.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picLyrics_MouseClick);
+            this.picLyrics.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             // 
             // picYouTube
             // 
@@ -487,6 +489,7 @@
             this.toolTip1.SetToolTip(this.picYouTube, "Click to open music video on YouTube");
             this.picYouTube.Visible = false;
             this.picYouTube.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picYouTube_MouseClick);
+            this.picYouTube.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             // 
             // grpColumns
             // 
@@ -4079,6 +4082,7 @@
             this.panelsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.resetAllPanels,
             this.userCanMovePanels,
+            this.autoResizeList,
             this.toolStripMenuItem8,
             this.toggleSource,
             this.toggleDecades,
@@ -4112,6 +4116,15 @@
             this.userCanMovePanels.Name = "userCanMovePanels";
             this.userCanMovePanels.Size = new System.Drawing.Size(197, 22);
             this.userCanMovePanels.Text = "User can modify panels";
+            // 
+            // autoResizeList
+            // 
+            this.autoResizeList.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.autoResizeList.CheckOnClick = true;
+            this.autoResizeList.Name = "autoResizeList";
+            this.autoResizeList.Size = new System.Drawing.Size(299, 34);
+            this.autoResizeList.Text = "Auto-Resize Song List";
+            this.autoResizeList.Click += new System.EventHandler(this.autoResizeList_Click);
             // 
             // toolStripMenuItem8
             // 
@@ -4293,7 +4306,7 @@
             this.Controls.Add(this.tabHolder);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.MaximizeBox = false;
+            this.MaximizeBox = true;
             this.Name = "SetlistManager";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -4458,6 +4471,7 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ToolStripMenuItem panelsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetAllPanels;
+        private System.Windows.Forms.ToolStripMenuItem autoResizeList;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem hideToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toggleSource;

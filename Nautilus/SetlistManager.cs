@@ -97,6 +97,7 @@ namespace Nautilus
             Songs = new List<SongData>();
             duplicates = new List<int>();
             binFolder = Application.StartupPath + "\\bin\\";
+            AllSongs = new List<SongData>();
             FormPanels = new List<Panel>
                 {
                     PanelSource,
@@ -1300,6 +1301,7 @@ namespace Nautilus
             sw.WriteLine("UseTierNumbers=" + useTierNumbers.Checked);
             sw.WriteLine("UseTierDots=" + useTierDots.Checked);
             sw.WriteLine("UseSilentMode=" + silentMode.Checked);
+            sw.WriteLine("AutoResizeList=" + autoResizeList.Checked);
             sw.Dispose();
         }
 
@@ -1397,6 +1399,12 @@ namespace Nautilus
                 useTierNumbers.Checked = sr.ReadLine().Contains("True");
                 useTierDots.Checked = sr.ReadLine().Contains("True");
                 silentMode.Checked = sr.ReadLine().Contains("True");
+
+                autoResizeList.Checked = sr.ReadLine().Contains("True");
+                if (autoResizeList.Checked)
+                {
+                    toggleAutoResizeList(false);
+                }
             }
             catch (Exception)
             {}
@@ -2725,6 +2733,11 @@ namespace Nautilus
         
         private void resetAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (autoResizeList.Checked)
+            {
+                unmaximizeWindow();
+                resetWindowSize_Click(null, null);
+            }
             foreach (var panel in FormPanels)
             {
                 panel.Visible = true;
@@ -4911,6 +4924,7 @@ namespace Nautilus
 
         private void resetWindowSize_Click(object sender, EventArgs e)
         {
+            unmaximizeWindow();
             Size = new Size(831, 760);
         }
 
@@ -5291,6 +5305,52 @@ namespace Nautilus
             var help = new HelpForm(artist + " - " + title + " Song Lyrics", 
                 LyricsData.Lyrics.Replace("\n\n", "\n").Replace("\n", Environment.NewLine), false);
             help.ShowDialog();
+        }
+
+        private void unmaximizeWindow()
+        {
+            if (ActiveForm.WindowState == FormWindowState.Maximized)
+            {
+                ActiveForm.WindowState = FormWindowState.Normal;
+            }
+        }
+
+        private void toggleAutoResizeList(bool resetPanels = true)
+        {
+            if (resetPanels)
+            {
+                // Reset everything to default positions, otherwise the list can get into a weird state
+                resetWindowSize_Click(null, null);
+                resetAllToolStripMenuItem_Click(null, null);
+            }
+
+            if (autoResizeList.Checked)
+            {
+                // Make the list automatically stretch to the dimensions of the window
+                PanelInfo.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
+                lstSongs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            }
+            else
+            {
+                // Reset to the original anchors
+                PanelInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+                lstSongs.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            }
+            SaveOptions();
+        }
+
+        private void autoResizeList_Click(object sender, EventArgs e)
+        {
+            var response = MessageBox.Show("Toggling this will reset all panels. Do you want to continue?", AppName + " - " + "Auto-Resize List", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (response == DialogResult.No)
+            {
+                autoResizeList.Checked = !autoResizeList.Checked;
+            }
+            else
+            {
+                toggleAutoResizeList();
+
+            }
         }
     }
 
