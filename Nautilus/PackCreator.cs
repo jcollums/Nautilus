@@ -333,7 +333,6 @@ namespace Nautilus
 
         /// <summary>
         /// Splits the <c>inputFiles</c> list into multiple packs based on the maximum pack size (4GB)
-        /// and the file's folder/subfolder depending on splitting options selected.
         /// The resulting split list of files are stored in <c>inputFilePacks</c>.
         /// </summary>
         /// <remarks>
