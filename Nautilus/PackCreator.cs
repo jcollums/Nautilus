@@ -169,7 +169,7 @@ namespace Nautilus
         
         private void ClearThumbnails()
         {
-            var boxes = new List<PictureBox> { thumb1, thumb2, thumb3, thumb4, thumb5, thumb6, thumb7, thumb8, thumb9, thumb10 };
+            var boxes = new List<PictureBox> { thumb1, thumb2, thumb3, thumb4, thumb5, thumb6, thumb7, thumb8, thumb9, thumb10 }; 
             
             foreach (var box in boxes)
             {
