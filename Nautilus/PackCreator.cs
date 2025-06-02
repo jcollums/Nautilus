@@ -680,8 +680,8 @@ namespace Nautilus
                 using (var dtaOut = new StreamWriter(dtafile, false, fileEncoding))
                 {
                     dtaOut.WriteLine("#ifndef kControllerRealGuitar");
-                }       
-            }
+                }     
+            }           
 
             if (Directory.Exists(songsFolder))
             {
@@ -814,15 +814,15 @@ namespace Nautilus
                                     }
 
                                     //now rename that to songs.dta and just allow existing code to add it to the package
-                                    if (!Tools.MoveFile(songsFolder + "temp_songs.dta", songsFolder + "songs.dta"))
-                                    {
-                                        Log("Error renaming " + songsFolder + "temp_songs.dta");
-                                    }
+                                   if (!Tools.MoveFile(songsFolder + "temp_songs.dta", songsFolder + "songs.dta"))
+                                   {
+                                      Log("Error renaming " + songsFolder + "temp_songs.dta");
+                                   }
                                 }
                                 break;
                         }
                     }
-
+                                        
                     if (hidePackFromRB3.Checked)
                     {
                         using (var dtaOut = new StreamWriter(dtafile, true, fileEncoding))
@@ -1623,7 +1623,7 @@ namespace Nautilus
                 Log("Package Image changed");
                 return;
             }
-
+            
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
             getImage(files[0], picPackage);
         }
