@@ -100,9 +100,9 @@ namespace Nautilus
             toolTip1.SetToolTip(label3, "Choose the format for your pack");
             toolTip1.SetToolTip(radioCON, "Click here for use with retail consoles");
             toolTip1.SetToolTip(radioLIVE, "Click here for use with modded consoles");
-            toolTip1.SetToolTip(cboExtractedFiles, "Select what to do with internal files extracted from the song");
             toolTip1.SetToolTip(lstLog, "This is the application log. Right click to export");
 
+            toolTip1.SetToolTip(cboExtractedFiles, "Select what to do with internal files extracted from the song");
             cboExtractedFiles.SelectedIndex = RecycleExtracted;
 
             if (!Directory.Exists(tempFolder))
@@ -152,7 +152,7 @@ namespace Nautilus
                 txtFolder.Text = tFolder;
             }
         }
-
+        
         private void Log(string message)
         {
             if (lstLog.InvokeRequired)
@@ -166,11 +166,11 @@ namespace Nautilus
                 lstLog.SelectedIndex = lstLog.Items.Count - 1;
             }
         }
-
+        
         private void ClearThumbnails()
         {
             var boxes = new List<PictureBox> { thumb1, thumb2, thumb3, thumb4, thumb5, thumb6, thumb7, thumb8, thumb9, thumb10 };
-
+            
             foreach (var box in boxes)
             {
                 /*try
@@ -256,7 +256,7 @@ namespace Nautilus
                             if (VariousFunctions.ReadFileType(file) != XboxFileType.STFS) continue;
                             intFiles++;
                             inputFiles.Add(file);
-
+                            
                             var xPackage = new STFSPackage(file);
                             if (xPackage.ParseSuccess)
                             {
@@ -680,7 +680,7 @@ namespace Nautilus
                 using (var dtaOut = new StreamWriter(dtafile, false, fileEncoding))
                 {
                     dtaOut.WriteLine("#ifndef kControllerRealGuitar");
-                }
+                }       
             }
 
             if (Directory.Exists(songsFolder))
@@ -689,7 +689,7 @@ namespace Nautilus
                 var enoughFolders = Directory.GetDirectories(songsFolder);
                 if (enoughFolders.Any()) //only add if there's at least one folder in there
                 {
-                    packfiles.AddFolder("songs");
+                    packfiles.AddFolder("songs"); 
                     foreach (var sFile in songsInput.Where(sFile => Path.GetExtension(sFile) != ".dta"))
                     {
                         packfiles.AddFile(sFile, "songs/" + Path.GetFileName(sFile));
@@ -701,7 +701,7 @@ namespace Nautilus
                     foreach (var folder in subFolders)
                     {
                         if (backgroundWorker1.CancellationPending) return false;
-
+                        
                         var songName = folder.Substring(sFolderLength.Length, folder.Length - sFolderLength.Length);
                         songName = songName.Replace("\\", "");
 
@@ -713,19 +713,19 @@ namespace Nautilus
                             ending = songName.Substring(songName.Length - 3, 3);
                         }
                         if (ending == "(1)" || ending == "(2)" || ending == "(3)" || ending == "(4)" || ending == "(5)") continue;
-
+                        
                         filesAdded++;
                         Log("Adding files for song " + filesAdded + " ('" + songName + "')");
 
                         //add all items at the songfolder level (mostly .mid and .mogg files)
                         packfiles.AddFolder("songs/" + songName);
-
+                        
                         //if songs.dta is there, add to main songs.dta and then delete
                         if (File.Exists(songsFolder + songName + "\\songs.dta"))
                         {
                             var dtaIn = new StreamReader(songsFolder + songName + "\\songs.dta", fileEncoding);
-                            var dtaOut = new StreamWriter(dtafile, true, fileEncoding);
-
+                           var dtaOut = new StreamWriter(dtafile, true, fileEncoding);
+                                                                
                             while (dtaIn.Peek() >= 0)
                             {
                                 var line = dtaIn.ReadLine();
@@ -764,7 +764,7 @@ namespace Nautilus
 
                         //add all items at the gen level (mostly png_xbox and milo_xbox files)
                         packfiles.AddFolder("songs/" + songName + "/gen");
-
+                        
                         var subContents = Directory.GetFiles(songsFolder + songName + "\\gen");
                         if (!subContents.Any()) continue;
                         foreach (var content in subContents)
@@ -794,7 +794,7 @@ namespace Nautilus
                                 {
                                     //create temporary dta file
                                     File.Create(songsFolder + "temp_songs.dta").Dispose();
-
+                                    
                                     //process the duplicate dtas
                                     foreach (var c16 in c16Dta)
                                     {
@@ -829,7 +829,7 @@ namespace Nautilus
                         {
                             dtaOut.Write("#endif");
                         }
-                    }
+                    }                    
 
                     if (File.Exists(dtafile))
                     {
@@ -841,7 +841,7 @@ namespace Nautilus
                     }
                 }
             }
-
+            
             if (Directory.Exists(upgFolder))
             {
                 var checkUpg = Directory.GetFiles(upgFolder);
@@ -891,7 +891,7 @@ namespace Nautilus
                                 break;
                         }
                     }
-
+                    
                     packfiles.AddFolder("songs_upgrades");
                     if (File.Exists(upgFolder + "upgrades.dta"))
                     {
@@ -999,7 +999,7 @@ namespace Nautilus
                 {
                     Directory.CreateDirectory(tempFolder + "songs\\");
                 }*/
-
+                
                 EnableDisable(false);
 
                 Log("Where should I save the pack to?");
@@ -1021,7 +1021,7 @@ namespace Nautilus
                 {
                     fileOutput.FileName += "_" + PackNumberPlaceholder;
                 }
-
+                
                 fileOutput.InitialDirectory = txtFolder.Text;
                 if (fileOutput.ShowDialog() == DialogResult.OK)
                 {
@@ -1080,11 +1080,11 @@ namespace Nautilus
                 if (string.IsNullOrWhiteSpace(file))
                 {
                     var openFileDialog1 = new OpenFileDialog
-                    {
-                        Filter = "Image Files|*.bmp;*.jpg;*.jpeg;*.png",
-                        Title = "Select an image",
-                        InitialDirectory = Application.StartupPath + "\\res\\thumbs"
-                    };
+                        {
+                            Filter = "Image Files|*.bmp;*.jpg;*.jpeg;*.png",
+                            Title = "Select an image",
+                            InitialDirectory = Application.StartupPath + "\\res\\thumbs"
+                        };
                     if (openFileDialog1.ShowDialog() == DialogResult.OK)
                     {
                         contentImage = openFileDialog1.FileName;
@@ -1097,7 +1097,7 @@ namespace Nautilus
                     if ((file.Contains(".jpg") || file.Contains(".bmp") ||
                         file.Contains(".png") || file.Contains(".jpeg")) && !file.Contains(".png_xbox") && !file.Contains(".png_wii"))
                     {
-                        contentImage = file;
+                        contentImage = file; 
                     }
                     else
                     {
@@ -1115,10 +1115,10 @@ namespace Nautilus
                     Log(box.Name.Replace("pic", "") + " Image changed successfully");
                     return;
                 }
-
+                
                 var newimage = Application.StartupPath + "\\" + Path.GetFileNameWithoutExtension(contentImage) + ".png";
                 Tools.ResizeImage(contentImage, 64, "png", newimage);
-
+                    
                 if (File.Exists(newimage))
                 {
                     box.Image = Tools.NemoLoadImage(newimage);
@@ -1134,7 +1134,7 @@ namespace Nautilus
                 Log("Error loading image ... try again");
             }
         }
-
+        
         private void HandleDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
@@ -1299,11 +1299,11 @@ namespace Nautilus
                 Log("All set, going to try to build the pack for you");
                 Log("This may take a while, depending on how many songs");
                 Log("Unless you get an error or I crash, assume that I'm working!");
-
+                
                 Invoke(new MethodInvoker(() => Width = minWidth));
                 success = buildPackage();
             }
-
+            
             if (success)
             {
                 Log("Trying to unlock CON file");
@@ -1364,7 +1364,7 @@ namespace Nautilus
                     }
                 }
             }
-
+            
             if (success)
             {
                 if (currentPackIndex == inputFilePacks.Count - 1)
@@ -1445,12 +1445,12 @@ namespace Nautilus
         private void btnReset_Click(object sender, EventArgs e)
         {
             ClearThumbnails();
-
+            
             if (cboExtractedFiles.SelectedIndex != KeepExtracted)
             {
                 Tools.DeleteFolder(tempFolder, true);
             }
-
+            
             var newPackager = new PackCreator(xMainForm, buttonBackColor, buttonTextColor);
             xMainForm.activeForm = newPackager;
             newPackager.lstLog.Items.AddRange(lstLog.Items);
@@ -1499,7 +1499,7 @@ namespace Nautilus
                 }
             }
             Show();
-            Focus();
+            Focus();    
         }
 
         private void sendImage(object sender, MouseEventArgs e)
@@ -1614,7 +1614,7 @@ namespace Nautilus
             Tools.DeleteFolder(tempThumbs, true);
             Tools.DeleteFolder(tempFolder, cboExtractedFiles.SelectedIndex != KeepExtracted);
         }
-
+        
         private void pictureBox2_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
@@ -1667,7 +1667,7 @@ namespace Nautilus
         {
             var items = Thumbnails.Count();
             var counter = 9;
-
+            
             try
             {
                 if (!string.IsNullOrWhiteSpace(Thumbnails[thumbs - 10]))
@@ -1868,7 +1868,7 @@ namespace Nautilus
             Log("Drag and drop the CON / LIVE file(s) to be packaged here");
             Log("Or click 'Change Input Folder' to select the files");
             Log("Ready to begin");
-
+            
             txtFolder.Text = inputDir;
         }
 
