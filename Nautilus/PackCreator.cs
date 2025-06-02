@@ -701,7 +701,7 @@ namespace Nautilus
                     foreach (var folder in subFolders)
                     {
                         if (backgroundWorker1.CancellationPending) return false;
-                        
+                       
                         var songName = folder.Substring(sFolderLength.Length, folder.Length - sFolderLength.Length);
                         songName = songName.Replace("\\", "");
 
@@ -814,10 +814,10 @@ namespace Nautilus
                                     }
 
                                     //now rename that to songs.dta and just allow existing code to add it to the package
-                                   if (!Tools.MoveFile(songsFolder + "temp_songs.dta", songsFolder + "songs.dta"))
-                                   {
-                                      Log("Error renaming " + songsFolder + "temp_songs.dta");
-                                   }
+                                    if (!Tools.MoveFile(songsFolder + "temp_songs.dta", songsFolder + "songs.dta"))
+                                    {
+                                       Log("Error renaming " + songsFolder + "temp_songs.dta");
+                                    }
                                 }
                                 break;
                         }
