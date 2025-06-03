@@ -30,7 +30,7 @@ namespace Nautilus
         private static string tempThumbs;
         private static string sOpenPackage;
         private static string xOut;
-        private static string xOutPackPathTemplate;
+        private static string xOutTemplate;
         private Boolean continueSession;
         private CreateSTFS packfiles = new CreateSTFS();
         private DateTime startTime;
@@ -334,16 +334,13 @@ namespace Nautilus
         /// <summary>
         /// Splits the <c>inputFiles</c> list into multiple packs based on the maximum pack size (4GB)
         /// The resulting split list of files are stored in <c>inputFilePacks</c>.
-        /// </summary>
-        /// <remarks>
-        /// Example output might include:
         /// <code>
         /// inputFilesPacks = [
         ///     ["song1_con", "song2_con", ...],
         ///     ["song100_con", "song101_con", ...]
         /// ]
         /// </code>
-        /// </remarks>
+        /// </summary>
         private void populatePacks()
         {
             List<string> currentPack = new List<string>();
@@ -406,20 +403,19 @@ namespace Nautilus
 
         /// <summary>
         /// Populates the <c>inputFilePackPaths</c> list with the output file paths for each split pack,
-        /// based on <c>xOutPackPathTemplate</c>, which will be a static string if there's only one pack,
+        /// based on <c>xOutTemplate</c>, which will be a static string if there's only one pack,
         /// or a formatted template string with pack number if there are multiple packs.
-        /// This method should be called after <c>populatePacks</c> and <c>xOutPackPathTemplate</c>
+        /// This method should be called after <c>populatePacks</c> and <c>xOutTemplate</c>
         /// have been set, which would be after the user clicks Begin and chooses Save on the file dialog.
-        /// </summary>
-        /// <remarks>
-        /// Example output might include:
         /// <code>
+        /// xOutTemplate = "C:\\OutputDir\\MyCustomPack_{Pack#}"
         /// inputFilesPacks = [
         ///     "C:\\OutputDir\\MyCustomPack_01",
-        ///     "C:\\OutputDir\\MyCustomPack_02"
+        ///     "C:\\OutputDir\\MyCustomPack_02",
+        ///     "C:\\OutputDir\\MyCustomPack_03",
         /// ]
         /// </code>
-        /// </remarks>
+        /// </summary>
         private void populatePackPaths()
         {
             int packIndex = 0;
@@ -427,20 +423,18 @@ namespace Nautilus
 
             foreach (var pack in inputFilePacks)
             {
-                inputFilePackPaths.Add(formatPackTemplate(xOutPackPathTemplate, packIndex));
+                inputFilePackPaths.Add(formatPackTemplate(xOutTemplate, packIndex));
                 packIndex++;
             }
         }
 
         /// <summary>
         /// Produces something similar to a Rock Band pack number based on the index of the pack.
-        /// </summary>
-        /// <remarks>
         /// <code>
         /// formatPackIndex(0) => "01"
         /// formatPackIndex(8) => "09"
         /// </code>
-        /// </remarks>
+        /// </summary>
         private string formatPackIndex(int packIndex)
         {
             return (packIndex + 1).ToString().PadLeft(2, '0');
@@ -449,12 +443,10 @@ namespace Nautilus
         /// <summary>
         /// Replaces the placeholders in the user's chosen file output path (or anything that includes the placeholders),
         /// including the pack number
-        /// </summary>
-        /// <remarks>
         /// <code>
         /// template = "C:\\MyCustomPack_{Pack#}" => "C:\\MyCustomPack_01"
         /// </code>
-        /// </remarks>
+        /// </summary>
         private string formatPackTemplate(string template, int packIndex)
         {
             return template.Replace(PackNumberPlaceholder, formatPackIndex(packIndex));
@@ -1037,10 +1029,10 @@ namespace Nautilus
                     }
 
                     xOut = fileOutput.FileName;
-                    xOutPackPathTemplate = xOut;
+                    xOutTemplate = xOut;
 
                     // We've already calculated the files in each pack,
-                    // now that xOutPackPathTemplate is set we can calculate the what each pack's target path will be
+                    // now that xOutTemplate is set we can calculate the what each pack's target path will be
                     populatePackPaths();
                     currentPackIndex = 0;
 
