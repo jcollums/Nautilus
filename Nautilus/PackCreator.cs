@@ -1163,8 +1163,8 @@ namespace Nautilus
                 var xExplorer = new CONExplorer(Color.FromArgb(34, 169, 31), Color.White);
                 xExplorer.LoadCON(packPath);
                 xExplorer.Show();
-                Dispose();
             });
+            Dispose();
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -1421,6 +1421,7 @@ namespace Nautilus
             btnBegin.Enabled = true;
             toolTip1.SetToolTip(btnBegin, "Click to create pack");
             btnBegin.Text = "&Begin";
+
 
             btnViewPackage.Visible = true;
         }
