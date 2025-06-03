@@ -1422,7 +1422,9 @@ namespace Nautilus
             toolTip1.SetToolTip(btnBegin, "Click to create pack");
             btnBegin.Text = "&Begin";
 
-
+            if (inputFilePacks.Count > 1) {
+                btnViewPackage.Text =  $"&View Packages ({inputFilePacks.Count})";
+            }
             btnViewPackage.Visible = true;
         }
 
