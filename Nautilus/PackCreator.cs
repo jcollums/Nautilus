@@ -1159,10 +1159,12 @@ namespace Nautilus
 
         private void btnViewPackage_Click(object sender, EventArgs e)
         {
-            var xExplorer = new CONExplorer(Color.FromArgb(34, 169, 31), Color.White);
-            xExplorer.LoadCON(sOpenPackage);
-            xExplorer.Show();
-            Dispose();
+            inputFilePackPaths.ForEach(packPath => {
+                var xExplorer = new CONExplorer(Color.FromArgb(34, 169, 31), Color.White);
+                xExplorer.LoadCON(packPath);
+                xExplorer.Show();
+                Dispose();
+            });
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -1420,11 +1422,7 @@ namespace Nautilus
             toolTip1.SetToolTip(btnBegin, "Click to create pack");
             btnBegin.Text = "&Begin";
 
-            // The View Package button only makes sense if there's one package generated
-            if (inputFilePacks.Count == 1)
-            {
-                btnViewPackage.Visible = true;
-            }
+            btnViewPackage.Visible = true;
         }
 
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
