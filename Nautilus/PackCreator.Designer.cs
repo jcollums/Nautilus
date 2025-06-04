@@ -830,8 +830,9 @@
             "Permanently delete"});
             this.cboExtractedFiles.Location = new System.Drawing.Point(108, 321);
             this.cboExtractedFiles.Name = "cboExtractedFiles";
-            this.cboExtractedFiles.Size = new System.Drawing.Size(157, 21);
+            this.cboExtractedFiles.Size = new System.Drawing.Size(157, 28);
             this.cboExtractedFiles.TabIndex = 70;
+            this.cboExtractedFiles.SelectedIndexChanged += new System.EventHandler(this.cboExtractedFiles_SelectedIndexChanged);
             // 
             // PackCreator
             // 
