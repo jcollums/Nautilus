@@ -31,6 +31,7 @@ namespace Nautilus
         private static string sOpenPackage;
         private static string xOut;
         private static string xOutTemplate;
+        private static int extractedFilesOption = RecycleExtracted;
         private Boolean continueSession;
         private CreateSTFS packfiles = new CreateSTFS();
         private DateTime startTime;
@@ -1011,6 +1012,7 @@ namespace Nautilus
 
                 if (inputFilePacks.Count > 1)
                 {
+                    txtTitle.Text += " " + PackNumberPlaceholder;
                     fileOutput.FileName += "_" + PackNumberPlaceholder;
                 }
                 
@@ -1043,9 +1045,7 @@ namespace Nautilus
                 }
                 else
                 {
-                    toolTip1.SetToolTip(btnBegin, "Click to create pack");
-                    btnBegin.Text = "&Begin";
-                    EnableDisable(true);
+                    enableBeginUI();
                     Log("Process cancelled");
                 }
             }
@@ -1054,6 +1054,13 @@ namespace Nautilus
                 Log("There was an error: " + ex.Message);
                 EnableDisable(true);
             }
+        }
+
+        private void enableBeginUI()
+        {
+            toolTip1.SetToolTip(btnBegin, "Click to create pack");
+            btnBegin.Text = "&Begin";
+            EnableDisable(true);
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -1236,8 +1243,8 @@ namespace Nautilus
                 btnBegin.Visible = true;
                 return;
             }
-   
-            if (cboExtractedFiles.SelectedIndex == KeepExtracted)
+
+            if (extractedFilesOption == KeepExtracted)
             {
                 var moggs = Directory.GetFiles(tempFolder, "*.mogg", SearchOption.AllDirectories);
                 foreach (var mogg in moggs)
@@ -1331,7 +1338,7 @@ namespace Nautilus
             }
 
         Finish:
-            if (cboExtractedFiles.SelectedIndex == KeepExtracted)
+            if (extractedFilesOption == KeepExtracted)
             {
                 Log("Keeping extracted files for next time");
             }
@@ -1342,11 +1349,11 @@ namespace Nautilus
                 {
                     try
                     {
-                        if (cboExtractedFiles.SelectedIndex == DeleteExtracted)
+                        if (extractedFilesOption == DeleteExtracted)
                         {
                             Tools.DeleteFolder(tempFolder, true); // delete files permanently
                         }
-                        else if (cboExtractedFiles.SelectedIndex == RecycleExtracted)
+                        else if (extractedFilesOption == RecycleExtracted)
                         {
                             Tools.SendtoTrash(tempFolder, true); // send files to recycle bin
                         }
@@ -1386,7 +1393,7 @@ namespace Nautilus
             if (string.IsNullOrWhiteSpace(sOpenPackage))
             {
                 // User must have cancelled the operation
-                onWorkerFinishedUI();
+                onWorkerFinishedUI(true);
                 return;
             }
 
@@ -1413,19 +1420,18 @@ namespace Nautilus
         /// <summary>
         /// Sets appropriate UI state when worker has finished processing or processing was cancelled.
         /// </summary>
-        private void onWorkerFinishedUI()
+        private void onWorkerFinishedUI(bool interrupted = false)
         {
             picWorking.Visible = false;
             btnReset.Visible = true;
             btnBegin.Visible = false;
-            btnBegin.Enabled = true;
-            toolTip1.SetToolTip(btnBegin, "Click to create pack");
-            btnBegin.Text = "&Begin";
 
-            if (inputFilePacks.Count > 1) {
-                btnViewPackage.Text =  $"&View Packages ({inputFilePacks.Count})";
+            if (!interrupted) {
+                if (inputFilePacks.Count > 1) {
+                    btnViewPackage.Text =  $"&View Packages ({inputFilePacks.Count})";
+                }
+                btnViewPackage.Visible = true;
             }
-            btnViewPackage.Visible = true;
         }
 
         private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -1464,11 +1470,11 @@ namespace Nautilus
                 {
                     try
                     {
-                        if (cboExtractedFiles.SelectedIndex == DeleteExtracted)
+                        if (extractedFilesOption == DeleteExtracted)
                         {
                             Tools.DeleteFolder(tempFolder, true); //delete files permanently
                         }
-                        else if (cboExtractedFiles.SelectedIndex == RecycleExtracted)
+                        else if (extractedFilesOption == RecycleExtracted)
                         {
                             Tools.SendtoTrash(tempFolder, true); // send files to recycle bin
                         }
@@ -1960,6 +1966,12 @@ namespace Nautilus
         private void btnRB3_Click(object sender, EventArgs e)
         {
             rockBand3ToolStripMenuItem_Click(sender, e);
+        }
+
+        private void cboExtractedFiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // The worker thread will need to access this so assign it to a static var
+            extractedFilesOption = cboExtractedFiles.SelectedIndex;
         }
     }
 }
