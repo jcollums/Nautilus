@@ -1412,7 +1412,6 @@ namespace Nautilus
                 if (inputFilePacks.Count > 1)
                 {
                     Log("All split packs finished processing");
-
                 }
             }
             else
