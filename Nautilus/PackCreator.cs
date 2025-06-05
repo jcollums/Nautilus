@@ -981,6 +981,9 @@ namespace Nautilus
 
         private void EnableDisable(bool enabled)
         {
+            btnRB1.Enabled = enabled;
+            btnRB2.Enabled = enabled;
+            btnRB3.Enabled = enabled;
             txtFolder.Enabled = enabled;
             btnFolder.Enabled = enabled;
             btnRefresh.Enabled = enabled;
