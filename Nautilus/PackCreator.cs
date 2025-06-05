@@ -208,6 +208,9 @@ namespace Nautilus
 
             if (txtFolder.Text != "")
             {
+                EnableDisable(false);
+                picWorking.Visible = true;
+
                 Log("");
                 Log("Reading input directory ... hang on");
                 Tools.DeleteFolder(tempThumbs, true);
@@ -253,6 +256,8 @@ namespace Nautilus
                     var inFiles = Directory.GetFiles(txtFolder.Text, ".", doRecursiveSearching ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).OrderBy(f => f).ToList();
                     foreach (var file in inFiles)
                     {
+                        // Allow the user to interact with the window while this is processing
+                        Application.DoEvents();
                         try
                         {
                             if (VariousFunctions.ReadFileType(file) != XboxFileType.STFS) continue;
@@ -331,6 +336,9 @@ namespace Nautilus
                 btnViewPackage.Visible = false;
                 btnRefresh.Visible = false;
             }
+
+            picWorking.Visible = false;
+            EnableDisable(true);
         }
 
         /// <summary>
@@ -473,7 +481,10 @@ namespace Nautilus
             var success = 0;
             foreach (var file in currentPack.Where(File.Exists))
             {
-                if (backgroundWorker1.CancellationPending) return false;
+                if (backgroundWorker1.CancellationPending) {
+                    sOpenPackage = "";
+                    return false;
+                }
                 try
                 {
                     if (VariousFunctions.ReadFileType(file) != XboxFileType.STFS) continue;
@@ -493,6 +504,7 @@ namespace Nautilus
                         Tools.DeleteFolder(temptempFile, true);
                         if (backgroundWorker1.CancellationPending)
                         {
+                            sOpenPackage = "";
                             xPackage.CloseIO();
                             return false;
                         }
@@ -653,8 +665,10 @@ namespace Nautilus
 
         private bool addFiles()
         {
-            if (backgroundWorker1.CancellationPending) return false;
-
+            if (backgroundWorker1.CancellationPending) {
+                sOpenPackage = "";
+                return false;
+            }
             var filesAdded = 0;
             var totalInput = 0;
 
@@ -701,8 +715,10 @@ namespace Nautilus
                     var sFolderLength = songsFolder;
                     foreach (var folder in subFolders)
                     {
-                        if (backgroundWorker1.CancellationPending) return false;
-                       
+                        if (backgroundWorker1.CancellationPending) {
+                            sOpenPackage = "";
+                            return false;
+                        }
                         var songName = folder.Substring(sFolderLength.Length, folder.Length - sFolderLength.Length);
                         songName = songName.Replace("\\", "");
 
@@ -754,7 +770,10 @@ namespace Nautilus
                         {
                             foreach (var content in songContents)
                             {
-                                if (backgroundWorker1.CancellationPending) return false;
+                                if (backgroundWorker1.CancellationPending) {
+                                    sOpenPackage = "";
+                                    return false;
+                                }
                                 if (Path.GetExtension(content) == ".mogg")
                                 {
                                     nautilus3.WriteOutData(nautilus3.DeObfM(File.ReadAllBytes(content)), content);
@@ -770,8 +789,10 @@ namespace Nautilus
                         if (!subContents.Any()) continue;
                         foreach (var content in subContents)
                         {
-                            if (backgroundWorker1.CancellationPending) return false;
-
+                            if (backgroundWorker1.CancellationPending) {
+                                sOpenPackage = "";
+                                return false;
+                            }
                             packfiles.AddFile(content, "songs/" + songName + "/gen/" + Path.GetFileName(content));
                         }
                     }
@@ -960,6 +981,7 @@ namespace Nautilus
 
         private void EnableDisable(bool enabled)
         {
+            txtFolder.Enabled = enabled;
             btnFolder.Enabled = enabled;
             btnRefresh.Enabled = enabled;
             picPackage.Enabled = enabled;
@@ -1236,8 +1258,10 @@ namespace Nautilus
             }
 
             var success = false;
-            if (backgroundWorker1.CancellationPending) goto Finish;
-
+            if (backgroundWorker1.CancellationPending) {
+                sOpenPackage = "";
+                goto Finish;
+            }
             //check if the CON/LIVE files were actually RB songs or not
             //if not, end
             var isRbSong = Directory.Exists(tempFolder + "songs\\") || Directory.Exists(tempFolder + "songs_upgrades\\");
