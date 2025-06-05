@@ -50,6 +50,7 @@ namespace Nautilus
         private readonly Color buttonBackColor;
         private readonly Color buttonTextColor;
 
+        // cboExtractedFiles options
         private const int KeepExtracted = 0;
         private const int RecycleExtracted = 1;
         private const int DeleteExtracted = 2;
