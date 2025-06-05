@@ -478,9 +478,9 @@
             this.btnViewPackage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnViewPackage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnViewPackage.ForeColor = System.Drawing.Color.White;
-            this.btnViewPackage.Location = new System.Drawing.Point(304, 317);
+            this.btnViewPackage.Location = new System.Drawing.Point(280, 317);
             this.btnViewPackage.Name = "btnViewPackage";
-            this.btnViewPackage.Size = new System.Drawing.Size(100, 29);
+            this.btnViewPackage.Size = new System.Drawing.Size(124, 29);
             this.btnViewPackage.TabIndex = 29;
             this.btnViewPackage.Text = "&View Package";
             this.btnViewPackage.UseVisualStyleBackColor = false;
@@ -608,6 +608,14 @@
             this.uTF8ToolStripMenuItem.Text = "UTF8";
             this.uTF8ToolStripMenuItem.Click += new System.EventHandler(this.uTF8ToolStripMenuItem_Click);
             // 
+            // hidePackFromRB3
+            // 
+            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.hidePackFromRB3.CheckOnClick = true;
+            this.hidePackFromRB3.Name = "hidePackFromRB3";
+            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
+            this.hidePackFromRB3.Text = "Hide pack from RB3";
+            // 
             // helpToolStripMenuItem1
             // 
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
@@ -628,9 +636,9 @@
             this.btnReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnReset.ForeColor = System.Drawing.Color.White;
-            this.btnReset.Location = new System.Drawing.Point(304, 283);
+            this.btnReset.Location = new System.Drawing.Point(280, 283);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(100, 29);
+            this.btnReset.Size = new System.Drawing.Size(124, 29);
             this.btnReset.TabIndex = 40;
             this.btnReset.Text = "&Reset";
             this.btnReset.UseVisualStyleBackColor = false;
@@ -800,14 +808,6 @@
             this.btnRB3.UseVisualStyleBackColor = true;
             this.btnRB3.Click += new System.EventHandler(this.btnRB3_Click);
             // 
-            // hidePackFromRB3
-            // 
-            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.hidePackFromRB3.CheckOnClick = true;
-            this.hidePackFromRB3.Name = "hidePackFromRB3";
-            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
-            this.hidePackFromRB3.Text = "Hide pack from RB3";
-            // 
             // label5
             // 
             this.label5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -830,7 +830,7 @@
             "Permanently delete"});
             this.cboExtractedFiles.Location = new System.Drawing.Point(108, 321);
             this.cboExtractedFiles.Name = "cboExtractedFiles";
-            this.cboExtractedFiles.Size = new System.Drawing.Size(157, 28);
+            this.cboExtractedFiles.Size = new System.Drawing.Size(157, 21);
             this.cboExtractedFiles.TabIndex = 70;
             this.cboExtractedFiles.SelectedIndexChanged += new System.EventHandler(this.cboExtractedFiles_SelectedIndexChanged);
             // 

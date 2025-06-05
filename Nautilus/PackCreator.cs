@@ -431,10 +431,7 @@ namespace Nautilus
 
         /// <summary>
         /// Produces something similar to a Rock Band pack number based on the index of the pack.
-        /// <code>
-        /// formatPackIndex(0) => "01"
-        /// formatPackIndex(8) => "09"
-        /// </code>
+        /// <code>formatPackIndex(0) => "01"</code>
         /// </summary>
         private string formatPackIndex(int packIndex)
         {
@@ -444,13 +441,23 @@ namespace Nautilus
         /// <summary>
         /// Replaces the placeholders in the user's chosen file output path (or anything that includes the placeholders),
         /// including the pack number
-        /// <code>
-        /// template = "C:\\MyCustomPack_{Pack#}" => "C:\\MyCustomPack_01"
-        /// </code>
+        /// <code>template = "C:\\CustomPack_{Pack#}" => "C:\\CustomPack_01"</code>
         /// </summary>
         private string formatPackTemplate(string template, int packIndex)
         {
             return template.Replace(PackNumberPlaceholder, formatPackIndex(packIndex));
+        }
+
+        /// <summary>
+        /// Adds the pack number placeholder to the template if it doesn't already exist.
+        /// </summary> 
+        private string addPackNumberPlaceholder(string template, string spacer)
+        {
+            if (template.Contains(PackNumberPlaceholder))
+            {
+                return template;
+            }
+            return template + spacer + PackNumberPlaceholder;
         }
 
         private bool extractRBFiles()
@@ -1012,8 +1019,8 @@ namespace Nautilus
 
                 if (inputFilePacks.Count > 1)
                 {
-                    txtTitle.Text += " " + PackNumberPlaceholder;
-                    fileOutput.FileName += "_" + PackNumberPlaceholder;
+                    txtTitle.Text = addPackNumberPlaceholder(txtTitle.Text, " ");
+                    fileOutput.FileName = addPackNumberPlaceholder(fileOutput.FileName, "_");
                 }
                 
                 fileOutput.InitialDirectory = txtFolder.Text;
@@ -1177,6 +1184,8 @@ namespace Nautilus
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             sOpenPackage = "";
+            if (backgroundWorker1.CancellationPending) return;
+            
             if (inputFilePacks.Count > 1)
             {
                 xOut = inputFilePackPaths[currentPackIndex];
@@ -1226,10 +1235,7 @@ namespace Nautilus
             }
 
             var success = false;
-            if (backgroundWorker1.CancellationPending)
-            {
-                goto Finish;
-            }
+            if (backgroundWorker1.CancellationPending) goto Finish;
 
             //check if the CON/LIVE files were actually RB songs or not
             //if not, end
@@ -1428,7 +1434,7 @@ namespace Nautilus
 
             if (!interrupted) {
                 if (inputFilePacks.Count > 1) {
-                    btnViewPackage.Text =  $"&View Packages ({inputFilePacks.Count})";
+                    btnViewPackage.Text =  $"&View Packages";
                 }
                 btnViewPackage.Visible = true;
             }
