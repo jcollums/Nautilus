@@ -1005,8 +1005,9 @@ namespace Nautilus
                 }
                 else
                 {
-                    // Since we are deleting temp files after each pack there will be one pack size of overhead
-                    targetDriveRequiredSpace += MAX_PACK_SIZE;
+                    // Since we are deleting temp files after each pack there should be one pack size of overhead
+                    long overhead = targetDriveRequiredSpace < MAX_PACK_SIZE ? targetDriveRequiredSpace : MAX_PACK_SIZE;
+                    targetDriveRequiredSpace += overhead;
                 }
                 tempDriveRequiredSpace = 0;
                 tempFilesWarningText = "This includes space required to extract temp files. This might be avoided by selecting the 'Permanently delete' option for extracted files.\n";
@@ -1023,7 +1024,7 @@ namespace Nautilus
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Warning);
                 
-                // Giving the user the option to continue because the math is slightly fuzzy, and they may want to delete stuff on the fly
+                // Giving the user the option to continue in case they want to delete stuff on the fly
                 if (response == DialogResult.No) {
                     return false;
                 }
