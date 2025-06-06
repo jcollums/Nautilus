@@ -31,6 +31,7 @@ namespace Nautilus
         private static string sOpenPackage;
         private static string xOut;
         private static string xOutTemplate;
+        private static long inputFilesTotalSize = 0;
         private static int extractedFilesOption = RecycleExtracted;
         private Boolean continueSession;
         private CreateSTFS packfiles = new CreateSTFS();
@@ -408,6 +409,8 @@ namespace Nautilus
                                 inputFilePacks.Count + " numbered packs will be created when you begin the process.",
                                 Text + " - Packs", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            inputFilesTotalSize = totalSize;
             EnableDisable(true);
         }
 
@@ -979,6 +982,68 @@ namespace Nautilus
             return success;
         }
 
+        /// <summary>
+        /// Checks if the target drive(s) have enough space to generate the packs and gives user option to cancel the operation.
+        /// Should be called after user chooses a save location because that's when we'll know what drives are involved.
+        /// </summary>
+        private bool hasAvailableSpace()
+        {
+            DriveInfo targetDrive = new DriveInfo(Path.GetPathRoot(xOut));
+            long targetDriveAvailableSpace = targetDrive.AvailableFreeSpace;
+            long targetDriveRequiredSpace = inputFilesTotalSize;
+
+            DriveInfo tempFilesDrive = new DriveInfo(Path.GetPathRoot(Application.StartupPath));
+            long tempDriveAvailableSpace = tempFilesDrive.AvailableFreeSpace;
+            long tempDriveRequiredSpace = inputFilesTotalSize;
+
+            string tempFilesWarningText = "";
+            if (targetDrive.Name == tempFilesDrive.Name)
+            {
+                if (extractedFilesOption != DeleteExtracted)
+                {
+                    targetDriveRequiredSpace += tempDriveRequiredSpace;
+                }
+                else
+                {
+                    // Since we are deleting temp files after each pack there will be one pack size of overhead
+                    targetDriveRequiredSpace += MAX_PACK_SIZE;
+                }
+                tempDriveRequiredSpace = 0;
+                tempFilesWarningText = "This includes space required to extract temp files. This might be avoided by selecting the 'Permanently delete' option for extracted files.\n";
+            }
+
+            if (targetDriveAvailableSpace < targetDriveRequiredSpace)
+            {
+                string pack = inputFilePacks.Count == 1 ? "pack" : "packs";
+                decimal sizeInGB = (decimal)targetDriveRequiredSpace / GB;
+                var response = MessageBox.Show($"There is not enough disk space ({sizeInGB:F2} GB) on drive {targetDrive.Name} to save your {pack}.\n\n" +
+                                $"{tempFilesWarningText}\n\n" +
+                                "Do you want to continue?",
+                                "Low Disk Space",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Warning);
+                
+                // Giving the user the option to continue because the math is slightly fuzzy, and they may want to delete stuff on the fly
+                if (response == DialogResult.No) {
+                    return false;
+                }
+            }
+
+            if (tempDriveAvailableSpace < tempDriveRequiredSpace)
+            {
+                decimal sizeInGB = (decimal)tempDriveRequiredSpace / GB;
+                var response = MessageBox.Show($"There is not enough disk space ({sizeInGB:F2} GB) on drive {tempFilesDrive.Name} to extract all the required temp files.\n\n" +
+                                "Do you want to continue?",
+                                "Low Disk Space",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Warning);
+                if (response == DialogResult.No) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private void EnableDisable(bool enabled)
         {
             btnRB1.Enabled = enabled;
@@ -1068,6 +1133,12 @@ namespace Nautilus
 
                     // We've already calculated the files in each pack,
                     // now that xOutTemplate is set we can calculate the what each pack's target path will be
+                    if (!hasAvailableSpace())
+                    {
+                        Log("User cancelled the operation due to low space");
+                        enableBeginUI();
+                        return;
+                    }
                     populatePackPaths();
                     currentPackIndex = 0;
 
