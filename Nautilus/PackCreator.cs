@@ -1006,7 +1006,7 @@ namespace Nautilus
                 else
                 {
                     // Since we are deleting temp files after each pack there should be one pack size of overhead
-                    long overhead = targetDriveRequiredSpace < MAX_PACK_SIZE ? targetDriveRequiredSpace : MAX_PACK_SIZE;
+                    long overhead = Math.Max(targetDriveRequiredSpace, MAX_PACK_SIZE);
                     targetDriveRequiredSpace += overhead;
                 }
                 tempDriveRequiredSpace = 0;
