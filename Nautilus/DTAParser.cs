@@ -959,7 +959,7 @@ namespace Nautilus
                             }
                             else if (line.Contains("drum_bank"))
                             {
-                                song.DrumBank = line.Replace("drum_bank", "").Replace("(", "").Replace(")", "").Trim();
+                                song.DrumBank = getDTAStringValue(line, "drum_bank");
                             }
                             else if (line.Contains("song_scroll_speed"))
                             {
@@ -2240,6 +2240,24 @@ namespace Nautilus
         }
 
         /// <summary>
+        /// Can be used to get the raw string value of a DTA entry containing a specified field.
+        /// <code>getDTAStringValue("('name' \"Ain't Messin Round (RB3 version)\")", "name") => Ain't Messin Round (RB3 version)</code>
+        /// <code>getDTAStringValue("\t(\n\tdrum_bank\n\t"sfx/kit01_bank.milo"\n)", "drum_bank") => sfx/kit01_bank.milo</code>
+        /// </summary>
+        private string getDTAStringValue(string line, string field)
+        {
+            string quote = "['\"]";
+            string openCloseParen = "^\\(|\\)$";
+            string openCloseQuote = $"^{quote}|{quote}$";
+
+            string result = RemoveDTAComments(line).Trim();
+            result = Regex.Replace(result, $"{quote}?{field}{quote}?", "").Trim();
+            result = Regex.Replace(result, openCloseParen, "").Trim();
+            result = Regex.Replace(result, openCloseQuote, "").Trim();
+            return result;
+        }
+
+        /// <summary>
         /// Returns int total number of audio channels in the song
         /// </summary>
         /// <param name="raw_line">Raw line from songs.dta file containing the "cores" information</param>
@@ -2528,7 +2546,14 @@ namespace Nautilus
             }
             catch (Exception)
             {
-                return "";
+                try
+                {
+                    return GetSongDuration(Convert.ToDouble(raw_line));
+                }
+                catch
+                {
+                    return "0:00";
+                }
             }
         }
 
