@@ -1062,6 +1062,9 @@ namespace Nautilus
             cboExtractedFiles.Enabled = enabled;
             menuStrip1.Enabled = enabled;
             btnShowHide.Visible = enabled;
+            
+            // Never disable the cancel button
+            btnBegin.Enabled = btnBegin.Text == "Cancel" ? true : enabled;
         }
 
         private void btnBegin_Click(object sender, EventArgs e)
