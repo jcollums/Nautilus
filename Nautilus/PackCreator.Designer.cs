@@ -57,7 +57,6 @@
             this.picPin = new System.Windows.Forms.PictureBox();
             this.btnViewPackage = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.chkKeepFiles = new System.Windows.Forms.CheckBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.useExistingFolderStructureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +69,7 @@
             this.setDTAEncodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aNSIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uTF8ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnReset = new System.Windows.Forms.Button();
@@ -84,7 +84,8 @@
             this.btnRB1 = new System.Windows.Forms.Button();
             this.btnRB2 = new System.Windows.Forms.Button();
             this.btnRB3 = new System.Windows.Forms.Button();
-            this.hidePackFromRB3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cboExtractedFiles = new System.Windows.Forms.ComboBox();
             this.contextMenuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumb10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumb9)).BeginInit();
@@ -477,9 +478,9 @@
             this.btnViewPackage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnViewPackage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnViewPackage.ForeColor = System.Drawing.Color.White;
-            this.btnViewPackage.Location = new System.Drawing.Point(304, 317);
+            this.btnViewPackage.Location = new System.Drawing.Point(280, 317);
             this.btnViewPackage.Name = "btnViewPackage";
-            this.btnViewPackage.Size = new System.Drawing.Size(100, 29);
+            this.btnViewPackage.Size = new System.Drawing.Size(124, 29);
             this.btnViewPackage.TabIndex = 29;
             this.btnViewPackage.Text = "&View Package";
             this.btnViewPackage.UseVisualStyleBackColor = false;
@@ -492,21 +493,6 @@
             this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
-            // 
-            // chkKeepFiles
-            // 
-            this.chkKeepFiles.AllowDrop = true;
-            this.chkKeepFiles.AutoSize = true;
-            this.chkKeepFiles.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.chkKeepFiles.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkKeepFiles.Location = new System.Drawing.Point(4, 320);
-            this.chkKeepFiles.Name = "chkKeepFiles";
-            this.chkKeepFiles.Size = new System.Drawing.Size(232, 23);
-            this.chkKeepFiles.TabIndex = 31;
-            this.chkKeepFiles.Text = "Keep extracted files for future use";
-            this.chkKeepFiles.UseVisualStyleBackColor = true;
-            this.chkKeepFiles.DragDrop += new System.Windows.Forms.DragEventHandler(this.HandleDragDrop);
-            this.chkKeepFiles.DragEnter += new System.Windows.Forms.DragEventHandler(this.HandleDragEnter);
             // 
             // menuStrip1
             // 
@@ -622,6 +608,14 @@
             this.uTF8ToolStripMenuItem.Text = "UTF8";
             this.uTF8ToolStripMenuItem.Click += new System.EventHandler(this.uTF8ToolStripMenuItem_Click);
             // 
+            // hidePackFromRB3
+            // 
+            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.hidePackFromRB3.CheckOnClick = true;
+            this.hidePackFromRB3.Name = "hidePackFromRB3";
+            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
+            this.hidePackFromRB3.Text = "Hide pack from RB3";
+            // 
             // helpToolStripMenuItem1
             // 
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
@@ -642,9 +636,9 @@
             this.btnReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnReset.ForeColor = System.Drawing.Color.White;
-            this.btnReset.Location = new System.Drawing.Point(304, 283);
+            this.btnReset.Location = new System.Drawing.Point(280, 283);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(100, 29);
+            this.btnReset.Size = new System.Drawing.Size(124, 29);
             this.btnReset.TabIndex = 40;
             this.btnReset.Text = "&Reset";
             this.btnReset.UseVisualStyleBackColor = false;
@@ -814,13 +808,31 @@
             this.btnRB3.UseVisualStyleBackColor = true;
             this.btnRB3.Click += new System.EventHandler(this.btnRB3_Click);
             // 
-            // hidePackFromRB3
+            // label5
             // 
-            this.hidePackFromRB3.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.hidePackFromRB3.CheckOnClick = true;
-            this.hidePackFromRB3.Name = "hidePackFromRB3";
-            this.hidePackFromRB3.Size = new System.Drawing.Size(221, 22);
-            this.hidePackFromRB3.Text = "Hide pack from RB3";
+            this.label5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label5.Font = new System.Drawing.Font("Times New Roman", 12F);
+            this.label5.Location = new System.Drawing.Point(4, 314);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(270, 34);
+            this.label5.TabIndex = 69;
+            this.label5.Text = "Extracted files:";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cboExtractedFiles
+            // 
+            this.cboExtractedFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboExtractedFiles.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.cboExtractedFiles.FormattingEnabled = true;
+            this.cboExtractedFiles.Items.AddRange(new object[] {
+            "Keep for future use",
+            "Send to Recycle Bin",
+            "Permanently delete"});
+            this.cboExtractedFiles.Location = new System.Drawing.Point(108, 321);
+            this.cboExtractedFiles.Name = "cboExtractedFiles";
+            this.cboExtractedFiles.Size = new System.Drawing.Size(157, 21);
+            this.cboExtractedFiles.TabIndex = 70;
+            this.cboExtractedFiles.SelectedIndexChanged += new System.EventHandler(this.cboExtractedFiles_SelectedIndexChanged);
             // 
             // PackCreator
             // 
@@ -828,6 +840,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(590, 482);
+            this.Controls.Add(this.cboExtractedFiles);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.btnRB3);
             this.Controls.Add(this.btnRB2);
             this.Controls.Add(this.btnRB1);
@@ -837,7 +851,6 @@
             this.Controls.Add(this.btnShowHide);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.chkKeepFiles);
             this.Controls.Add(this.btnViewPackage);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
@@ -906,7 +919,6 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button btnViewPackage;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.CheckBox chkKeepFiles;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem1;
@@ -945,5 +957,7 @@
         private System.Windows.Forms.Button btnRB2;
         private System.Windows.Forms.Button btnRB3;
         private System.Windows.Forms.ToolStripMenuItem hidePackFromRB3;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox cboExtractedFiles;
     }
 }
